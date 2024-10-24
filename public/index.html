@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROGRAMACION EN LA NUBE/ GRUPO 3</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link your CSS file if any -->
+</head>
+<body>
+    <h1>PROGRAMACION EN LA NUBE/ GRUPO 3</h1>
+
+    <!-- Botón para traer información -->
+    <button id="fetch-data-btn">Traer Información</button>
+    <button id="clear-data-btn">Limpiar Información</button>
+
+    <!-- Textarea para mostrar la información -->
+    <textarea id="data-container" rows="10" cols="50" readonly></textarea>
+
+    <!-- Formulario para ingresar nueva información -->
+    <h2>Agregar Nuevo Cliente</h2>
+    <form id="cliente-form">
+        <label for="id">ID:</label>
+        <input type="text" id="id" name="id" required><br> <!-- New ID field -->
+    
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required><br>
+    
+        <label for="correo">Correo:</label>
+        <input type="email" id="correo" name="correo" required><br>
+    
+        <label for="telefono">Teléfono:</label>
+        <input type="text" id="telefono" name="telefono" required><br>
+    
+        <button type="submit">Agregar Cliente</button>
+    </form>
+
+    <h2>Modificar Cliente</h2>
+<form id="modify-cliente-form">
+    <label for="modify-id">ID:</label>
+    <input type="text" id="modify-id" name="modify-id" required><br>
+
+    <label for="modify-nombre">Nombre:</label>
+    <input type="text" id="modify-nombre" name="modify-nombre" required><br>
+
+    <label for="modify-correo">Correo:</label>
+    <input type="email" id="modify-correo" name="modify-correo" required><br>
+
+    <label for="modify-telefono">Teléfono:</label>
+    <input type="text" id="modify-telefono" name="modify-telefono" required><br>
+
+    <button type="submit">Modificar Cliente</button>
+</form>
+
+    <script>
+        function fetchData() {
+            fetch('http://localhost:3000/api/datos')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(data); // Maneja la información obtenida
+                    const container = document.getElementById('data-container');
+                    
+                    // Limpiar la caja de texto antes de agregar nueva información
+                    container.value = '';
+                    
+                    // Iterar sobre los resultados y mostrar en el textarea
+                    data.forEach(row => {
+                        container.value += `ID: ${row[0]}, Nombre: ${row[1]}, Correo: ${row[2]}, Teléfono: ${row[3]}\n`;
+                    });
+                })
+                .catch(error => {
+                    console.error('There has been a problem with your fetch operation:', error);
+                });
+        }
+
+        document.getElementById('fetch-data-btn').addEventListener('click', fetchData);
+        
+        // Event listener for the clear button
+        document.getElementById('clear-data-btn').addEventListener('click', function() {
+            const container = document.getElementById('data-container');
+            container.value = ''; // Clear the textarea
+        });
+        // Función para traer la información
+        function fetchData() {
+            fetch('http://localhost:3000/api/datos')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(data); // Maneja la información obtenida
+                    const container = document.getElementById('data-container');
+                    
+                    // Limpiar la caja de texto antes de agregar nueva información
+                    container.value = '';
+                    
+                    // Iterar sobre los resultados y mostrar en el textarea
+                    data.forEach(row => {
+                        container.value += `ID: ${row[0]}, Nombre: ${row[1]}, Correo: ${row[2]}, Teléfono: ${row[3]}\n`;
+                    });
+                })
+                .catch(error => {
+                    console.error('There has been a problem with your fetch operation:', error);
+                });
+        }
+
+        document.getElementById('cliente-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Evitar que el formulario se envíe de forma tradicional
+        
+            // Obtener los valores del formulario
+            const id = document.getElementById('id').value; // Get ID value
+            const nombre = document.getElementById('nombre').value;
+            const correo = document.getElementById('correo').value;
+            const telefono = document.getElementById('telefono').value;
+        
+            // Enviar los datos al backend
+            fetch('http://localhost:3000/api/cliente', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id: id, // Send ID
+                    nombre: nombre,
+                    correo: correo,
+                    telefono: telefono
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Cliente agregado:', data);
+                alert('Cliente agregado exitosamente');
+                fetchData(); // Traer la información actualizada
+            })
+            .catch(error => {
+                console.error('Error al agregar el cliente:', error);
+            });
+        });
+
+        //put 
+
+        document.getElementById('modify-cliente-form').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent the form from submitting traditionally
+
+    // Get the values from the modification form
+    const id = document.getElementById('modify-id').value;
+    const nombre = document.getElementById('modify-nombre').value;
+    const correo = document.getElementById('modify-correo').value;
+    const telefono = document.getElementById('modify-telefono').value;
+
+    // Send the updated data to the backend
+    fetch(`http://localhost:3000/api/cliente/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            nombre: nombre,
+            correo: correo,
+            telefono: telefono
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Cliente modificado:', data);
+        alert('Cliente modificado exitosamente');
+        fetchData(); // Refresh the client list
+    })
+    .catch(error => {
+        console.error('Error al modificar el cliente:', error);
+    });
+});
+    </script>
+</body>
+</html>
