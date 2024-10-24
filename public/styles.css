@@ -1,17 +1,46 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-    margin: 0;
-    padding: 20px;
+    background-color: #121212;
+    color: #fff;
+    font-family: 'Roboto', sans-serif;
 }
 
-h1 {
-    color: #333;
+.futuristic-header {
+    font-size: 3rem;
+    font-weight: bold;
+    background: linear-gradient(to right, #00ffcc, #0066ff);
+    -webkit-background-clip: text;
+    color: transparent;
+    text-transform: uppercase;
 }
 
-#data {
-    background: white;
+.futuristic-subheader {
+    font-size: 1.5rem;
+    font-weight: bold;
+    background: linear-gradient(to right, #ff6600, #ff0066);
+    -webkit-background-clip: text;
+    color: transparent;
+    text-align: center;
+}
+
+.futuristic-textarea {
+    background-color: #1c1c1c;
+    color: #00ffcc;
+    border: 1px solid #0066ff;
+}
+
+button {
+    font-size: 1.1rem;
+}
+
+input, textarea {
+    border-radius: 10px;
     padding: 10px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #1e1e1e;
+    color: #00ffcc;
+    border: 1px solid #00ffcc;
+}
+
+input:focus, textarea:focus {
+    border-color: #0066ff;
+    box-shadow: 0 0 10px #00ffcc;
 }

@@ -4,325 +4,179 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Client Management System</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Link your CSS file if any -->
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <h1>Client Management System</h1>
+<body style="background-color: #f5f5f5;">
 
-    <!-- Section for Client Management -->
-    <section id="client-management">
-        <h2>Manage Clients</h2>
-        <form id="cliente-form">
-            <label for="id">ID:</label>
-            <input type="text" id="id" name="id" required><br> <!-- New ID field -->
-        
-            <label for="nombre">Nombre:</label>
-            <input type="text" id="nombre" name="nombre" required><br>
-        
-            <label for="correo">Correo:</label>
-            <input type="email" id="correo" name="correo" required><br>
-        
-            <label for="telefono">Teléfono:</label>
-            <input type="text" id="telefono" name="telefono" required><br>
-        
-            <button type="submit">Agregar Cliente</button>
-        </form>
+    <!-- Navbar with dropdown menu -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-primary">
+        <a class="navbar-brand text-white" href="#">Banco Línea</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="#client-management">Clientes</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="#account-management">Cuentas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="#transaction-management">Transacciones</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
 
-        <h2>Modify Client</h2>
-        <form id="modify-cliente-form">
-            <label for="modify-id">ID:</label>
-            <input type="text" id="modify-id" name="modify-id" required><br>
+    <div class="container mt-5">
+        <h1 class="text-center text-primary">Sistema de Gestión de Clientes</h1>
 
-            <label for="modify-nombre">Nombre:</label>
-            <input type="text" id="modify-nombre" name="modify-nombre" required><br>
+        <!-- Client Management Section -->
+        <section id="client-management" class="mt-5">
+            <h2 class="text-secondary">Gestión de Clientes</h2>
+            <form id="cliente-form" class="p-3 border rounded bg-white shadow-sm">
+                <div class="form-group">
+                    <label for="id">ID:</label>
+                    <input type="text" id="id" name="id" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" id="nombre" name="nombre" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="correo">Correo:</label>
+                    <input type="email" id="correo" name="correo" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="telefono">Teléfono:</label>
+                    <input type="text" id="telefono" name="telefono" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Agregar Cliente</button>
+            </form>
 
-            <label for="modify-correo">Correo:</label>
-            <input type="email" id="modify-correo" name="modify-correo" required><br>
+            <!-- Client Table -->
+            <h2 class="text-secondary mt-5">Lista de Clientes</h2>
+            <table class="table table-bordered table-striped mt-3">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Correo</th>
+                        <th>Teléfono</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="client-list">
+                    <!-- Client data will be populated here -->
+                </tbody>
+            </table>
+        </section>
 
-            <label for="modify-telefono">Teléfono:</label>
-            <input type="text" id="modify-telefono" name="modify-telefono" required><br>
+        <!-- Account Management Section -->
+        <section id="account-management" class="mt-5">
+            <h2 class="text-secondary">Gestión de Cuentas</h2>
+            <form id="account-form" class="p-3 border rounded bg-white shadow-sm">
+                <div class="form-group">
+                    <label for="account-id">Account ID:</label>
+                    <input type="text" id="account-id" name="account-id" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="account-number">Account Number:</label>
+                    <input type="text" id="account-number" name="account-number" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="account-type">Account Type:</label>
+                    <select id="account-type" name="account-type" class="form-control" required>
+                        <option value="">Selecciona el tipo de cuenta</option>
+                        <option value="1">Ahorros</option>
+                        <option value="2">Corriente</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="account-client-id">Client ID:</label>
+                    <input type="text" id="account-client-id" name="account-client-id" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Agregar Cuenta</button>
+            </form>
 
-            <button type="submit">Modificar Cliente</button>
-        </form>
+            <!-- Account Table -->
+            <h2 class="text-secondary mt-5">Lista de Cuentas</h2>
+            <table class="table table-bordered table-striped mt-3">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Account ID</th>
+                        <th>Account Number</th>
+                        <th>Account Type</th>
+                        <th>Client ID</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="account-list">
+                    <!-- Account data will be populated here -->
+                </tbody>
+            </table>
+        </section>
 
-        <h2>Client List</h2>
-        <table id="client-list">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Correo</th>
-                    <th>Teléfono</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Client data will be populated here -->
-            </tbody>
-        </table>
-    </section>
+        <!-- Transaction Management Section -->
+        <section id="transaction-management" class="mt-5">
+            <h2 class="text-secondary">Gestión de Transacciones</h2>
+            <form id="transaction-form" class="p-3 border rounded bg-white shadow-sm">
+                <div class="form-group">
+                    <label for="transaction-id">Transaction ID:</label>
+                    <input type="text" id="transaction-id" name="transaction-id" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="transaction-description">Descripción:</label>
+                    <input type="text" id="transaction-description" name="transaction-description" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="transaction-date">Fecha:</label>
+                    <input type="date" id="transaction-date" name="transaction-date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="transaction-account-id">Account ID:</label>
+                    <input type="text" id="transaction-account-id" name="transaction-account-id" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="transaction-income">Ingreso:</label>
+                    <input type="number" id="transaction-income" name="transaction-income" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="transaction-expense">Gasto:</label>
+                    <input type="number" id="transaction-expense" name="transaction-expense" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-primary">Agregar Transacción</button>
+            </form>
 
-    <!-- Section for Account Management -->
-    <section id="account-management">
-        <h2>Manage Accounts</h2>
-        <form id="account-form">
-            <label for="account-id">Account ID:</label>
-            <input type="text" id="account-id" name="account-id" required><br>
+            <!-- Transaction Table -->
+            <h2 class="text-secondary mt-5">Lista de Transacciones</h2>
+            <table class="table table-bordered table-striped mt-3">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Transaction ID</th>
+                        <th>Descripción</th>
+                        <th>Fecha</th>
+                        <th>Account ID</th>
+                        <th>Ingreso</th>
+                        <th>Gasto</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="transaction-list">
+                    <!-- Transaction data will be populated here -->
+                </tbody>
+            </table>
+        </section>
+    </div>
 
-            <label for="account-number">Account Number:</label>
-            <input type="text" id="account-number" name="account-number" required><br>
-
-            <label for="account-type">Account Type:</label>
-            <select id="account-type" name="account-type" required>
-                <option value="">Select Account Type</option>
-                <option value="1">Savings</option>
-                <option value="2">Checking</option>
-            </select><br>
-
-            <label for="account-client-id">Client ID:</label>
-            <input type="text" id="account-client-id" name="account-client-id" required><br>
-
-            <button type="submit">Agregar Cuenta</button>
-        </form>
-
-        <h2>Account List</h2>
-        <table id="account-list">
-            <thead>
-                <tr>
-                    <th>Account ID</th>
-                    <th>Account Number</th>
-                    <th>Account Type</th>
-                    <th>Client ID</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Account data will be populated here -->
-            </tbody>
-        </table>
-    </section>
-
-    <!-- Section for Transaction Management -->
-    <section id="transaction-management">
-        <h2>Record Transactions</h2>
-        <form id="transaction-form">
-            <label for="transaction-id">Transaction ID:</label>
-            <input type="text" id="transaction-id" name="transaction-id" required><br>
-
-            <label for="transaction-description">Description:</label>
-            <input type="text" id="transaction-description" name="transaction-description" required><br>
-
-            <label for="transaction-date">Date:</label>
-            <input type="date" id="transaction-date" name="transaction-date" required><br>
-
-            <label for="transaction-account-id">Account ID:</label>
-            <input type="text" id="transaction-account-id" name="transaction-account-id" required><br>
-
-            <label for="transaction-income">Income:</label>
-            <input type="number" id="transaction-income" name="transaction-income" step="0.01"><br>
-
-            <label for="transaction-expense">Expense:</label>
-            <input type="number" id="transaction-expense" name="transaction-expense" step="0.01"><br>
-
-            <button type="submit">Agregar Transacción</button>
-        </form>
-
-        <h2>Transaction List</h2>
-        <table id="transaction-list">
-            <thead>
-                <tr>
-                    <th>Transaction ID</th>
-                    <th>Description</th>
-                    <th>Date</th>
-                    <th>Account ID</th>
-                    <th>Income</th>
-                    <th>Expense</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Transaction data will be populated here -->
-            </tbody>
-        </table>
-    </section>
-
-    <script>
-        // Fetch and display clients
-        function fetchClients() {
-            fetch('http://localhost:3000/api/clientes')
-                .then(response => response.json())
-                .then(data => {
-                    const clientList = document.getElementById('client-list').getElementsByTagName('tbody')[0];
-                    clientList.innerHTML = ''; // Clear existing data
-                    data.forEach(client => {
-                        const row = clientList.insertRow();
-                        row.innerHTML = `
-                            <td>${client.id}</td>
-                            <td>${client.nombre}</td>
-                            <td>${client.correo}</td>
-                            <td>${client.telefono}</td>
-                            <td>
-                                <button onclick="deleteClient(${client.id})">Eliminar</button>
-                            </td>
-                        `;
-                    });
-                })
-                .catch(error => console.error('Error fetching clients:', error));
-        }
-
-        // Add new client
-        document.getElementById('cliente-form').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent form submission
-            const id = document.getElementById('id').value;
-            const nombre = document.getElementById('nombre').value;
-            const correo = document.getElementById('correo').value;
-            const telefono = document.getElementById('telefono').value;
-
-            fetch('http://localhost:3000/api/clientes', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ id, nombre, correo, telefono })
-            })
-            .then(response => response.json())
-            .then(() => {
-                alert('Cliente agregado exitosamente');
-                fetchClients(); // Refresh client list
-            })
-            .catch(error => console.error('Error adding client:', error));
-        });
-
-        // Delete client
-        function deleteClient(id) {
-            fetch(`http://localhost:3000/api/clientes/${id}`, {
-                method: 'DELETE'
-            })
-            .then(() => {
-                alert('Cliente eliminado exitosamente');
-                fetchClients(); // Refresh client list
-            })
-            .catch(error => console.error('Error deleting client:', error));
-        }
-
-        // Fetch and display accounts
-        function fetchAccounts() {
-            fetch('http://localhost:3000/api/cuentas')
-                .then(response => response.json())
-                .then(data => {
-                    const accountList = document.getElementById('account-list').getElementsByTagName('tbody')[0];
-                    accountList.innerHTML = ''; // Clear existing data
-                    data.forEach(account => {
-                        const row = accountList.insertRow();
-                        row.innerHTML = `
-                            <td>${account.id}</td>
-                            <td>${account.no_cuenta}</td>
-                            <td>${account.id_tipo}</td>
-                            <td>${account.id_cliente}</td>
-                            <td>
-                                <button onclick="deleteAccount(${account.id})">Eliminar</button>
-                            </td>
-                        `;
-                    });
-                })
-                .catch(error => console.error('Error fetching accounts:', error));
-        }
-
-        // Add new account
-        document.getElementById('account-form').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent form submission
-            const accountId = document.getElementById('account-id').value;
-            const accountNumber = document.getElementById('account-number').value;
-            const accountType = document.getElementById('account-type').value;
-            const clientId = document.getElementById('account-client-id').value;
-
-            fetch('http://localhost:3000/api/cuentas', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ accountId, accountNumber, accountType, clientId })
-            })
-            .then(response => response.json())
-            .then(() => {
-                alert('Cuenta agregada exitosamente');
-                fetchAccounts(); // Refresh account list
-            })
-            .catch(error => console.error('Error adding account:', error));
-        });
-
-        // Delete account
-        function deleteAccount(id) {
-            fetch(`http://localhost:3000/api/cuentas/${id}`, {
-                method: 'DELETE'
-            })
-            .then(() => {
-                alert('Cuenta eliminada exitosamente');
-                fetchAccounts(); // Refresh account list
-            })
-            .catch(error => console.error('Error deleting account:', error));
-        }
-
-        // Fetch and display transactions
-        function fetchTransactions() {
-            fetch('http://localhost:3000/api/transactions')
-                .then(response => response.json())
-                .then(data => {
-                    const transactionList = document.getElementById('transaction-list').getElementsByTagName('tbody')[0];
-                    transactionList.innerHTML = ''; // Clear existing data
-                    data.forEach(transaction => {
-                        const row = transactionList.insertRow();
-                        row.innerHTML = `
-                            <td>${transaction.id}</td>
-                            <td>${transaction.description}</td>
-                            <td>${transaction.date}</td>
-                            <td>${transaction.accountId}</td>
-                            <td>${transaction.income || 0}</td>
-                            <td>${transaction.expense || 0}</td>
-                            <td>
-                                <button onclick="deleteTransaction(${transaction.id})">Eliminar</button>
-                            </td>
-                        `;
-                    });
-                })
-                .catch(error => console.error('Error fetching transactions:', error));
-        }
-
-        // Add new transaction
-        document.getElementById('transaction-form').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent form submission
-            const transactionId = document.getElementById('transaction-id').value;
-            const description = document.getElementById('transaction-description').value;
-            const date = document.getElementById('transaction-date').value;
-            const accountId = document.getElementById('transaction-account-id').value;
-            const income = document.getElementById('transaction-income').value;
-            const expense = document.getElementById('transaction-expense').value;
-
-            fetch('http://localhost:3000/api/transactions', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ transactionId, description, date, accountId, income, expense })
-            })
-            .then(response => response.json())
-            .then(() => {
-                alert('Transacción agregada exitosamente');
-                fetchTransactions(); // Refresh transaction list
-            })
-            .catch(error => console.error('Error adding transaction:', error));
-        });
-
-        // Delete transaction
-        function deleteTransaction(id) {
-            fetch(`http://localhost:3000/api/transactions/${id}`, {
-                method: 'DELETE'
-            })
-            .then(() => {
-                alert('Transacción eliminada exitosamente');
-                fetchTransactions(); // Refresh transaction list
-            })
-            .catch(error => console.error('Error deleting transaction:', error));
-        }
-
-        // Initialize data
-        fetchClients();
-        fetchAccounts();
-        fetchTransactions();
-    </script>
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="app.js"></script> <!-- Link to your JavaScript file -->
 </body>
 </html>

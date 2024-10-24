@@ -4,55 +4,83 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PROGRAMACION EN LA NUBE/ GRUPO 3</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Link your CSS file if any -->
+
+    <!-- Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Link a tu archivo CSS personalizado -->
+    <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <h1>PROGRAMACION EN LA NUBE/ GRUPO 3</h1>
+<body class="bg-dark text-white">
+    <div class="container mt-5">
+        <h1 class="text-center futuristic-header mb-5">PROGRAMACION EN LA NUBE / GRUPO 3</h1>
 
-    <!-- Botón para traer información -->
-    <button id="fetch-data-btn">Traer Información</button>
-    <button id="clear-data-btn">Limpiar Información</button>
+        <!-- Botones para acciones -->
+        <div class="d-flex justify-content-center mb-4">
+            <button id="fetch-data-btn" class="btn btn-primary me-3">Traer Información</button>
+            <button id="clear-data-btn" class="btn btn-secondary">Limpiar Información</button>
+        </div>
 
-    <!-- Textarea para mostrar la información -->
-    <textarea id="data-container" rows="10" cols="50" readonly></textarea>
+        <!-- Textarea para mostrar la información -->
+        <div class="mb-4">
+            <textarea id="data-container" class="form-control futuristic-textarea" rows="10" readonly></textarea>
+        </div>
 
-    <!-- Formulario para ingresar nueva información -->
-    <h2>Agregar Nuevo Cliente</h2>
-    <form id="cliente-form">
-        <label for="id">ID:</label>
-        <input type="text" id="id" name="id" required><br> <!-- New ID field -->
-    
-        <label for="nombre">Nombre:</label>
-        <input type="text" id="nombre" name="nombre" required><br>
-    
-        <label for="correo">Correo:</label>
-        <input type="email" id="correo" name="correo" required><br>
-    
-        <label for="telefono">Teléfono:</label>
-        <input type="text" id="telefono" name="telefono" required><br>
-    
-        <button type="submit">Agregar Cliente</button>
-    </form>
+        <!-- Formulario para agregar cliente -->
+        <h2 class="text-center futuristic-subheader mb-4">Agregar Nuevo Cliente</h2>
+        <form id="cliente-form" class="mb-5">
+            <div class="mb-3">
+                <label for="id" class="form-label">ID:</label>
+                <input type="text" id="id" name="id" class="form-control" required>
+            </div>
 
-    <h2>Modificar Cliente</h2>
-<form id="modify-cliente-form">
-    <label for="modify-id">ID:</label>
-    <input type="text" id="modify-id" name="modify-id" required><br>
+            <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre:</label>
+                <input type="text" id="nombre" name="nombre" class="form-control" required>
+            </div>
 
-    <label for="modify-nombre">Nombre:</label>
-    <input type="text" id="modify-nombre" name="modify-nombre" required><br>
+            <div class="mb-3">
+                <label for="correo" class="form-label">Correo:</label>
+                <input type="email" id="correo" name="correo" class="form-control" required>
+            </div>
 
-    <label for="modify-correo">Correo:</label>
-    <input type="email" id="modify-correo" name="modify-correo" required><br>
+            <div class="mb-3">
+                <label for="telefono" class="form-label">Teléfono:</label>
+                <input type="text" id="telefono" name="telefono" class="form-control" required>
+            </div>
 
-    <label for="modify-telefono">Teléfono:</label>
-    <input type="text" id="modify-telefono" name="modify-telefono" required><br>
+            <button type="submit" class="btn btn-success w-100">Agregar Cliente</button>
+        </form>
 
-    <button type="submit">Modificar Cliente</button>
-</form>
+        <!-- Formulario para modificar cliente -->
+        <h2 class="text-center futuristic-subheader mb-4">Modificar Cliente</h2>
+        <form id="modify-cliente-form">
+            <div class="mb-3">
+                <label for="modify-id" class="form-label">ID:</label>
+                <input type="text" id="modify-id" name="modify-id" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="modify-nombre" class="form-label">Nombre:</label>
+                <input type="text" id="modify-nombre" name="modify-nombre" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="modify-correo" class="form-label">Correo:</label>
+                <input type="email" id="modify-correo" name="modify-correo" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="modify-telefono" class="form-label">Teléfono:</label>
+                <input type="text" id="modify-telefono" name="modify-telefono" class="form-control" required>
+            </div>
+
+            <button type="submit" class="btn btn-warning w-100">Modificar Cliente</button>
+        </form>
+    </div>
 
     <script>
-        function fetchData() {
+         function fetchData() {
             //fetch('http://localhost:3000/api/datos')
             fetch('https://banco-linea-27432012ae4f.herokuapp.com/api/datos')
                 .then(response => {
@@ -84,10 +112,10 @@
         document.getElementById('clear-data-btn').addEventListener('click', function() {
             const container = document.getElementById('data-container');
             container.value = ''; // Clear the textarea
-        });
+        }); 
         // Función para traer la información
         function fetchData() {
-            fetch('http://localhost:3000/api/datos')
+            fetch('https://banco-linea-27432012ae4f.herokuapp.com/api/datos')
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
