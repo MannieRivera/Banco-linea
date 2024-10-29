@@ -1,182 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Client Management System</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
+    <title>Banco - Inicio</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body style="background-color: #f5f5f5;">
-
-    <!-- Navbar with dropdown menu -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-primary">
-        <a class="navbar-brand text-white" href="#">Banco Línea</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="#client-management">Clientes</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="#account-management">Cuentas</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="#transaction-management">Transacciones</a>
-                </li>
+<body>
+    <header>
+        <h1>Bienvenido al Banco</h1>
+        <nav>
+            <ul>
+                <li><a href="registro.html">Registrar Cliente</a></li>
+                <li><a href="login.html">Iniciar Sesión</a></li>
             </ul>
-        </div>
-    </nav>
-
-    <div class="container mt-5">
-        <h1 class="text-center text-primary">Sistema de Gestión de Clientes</h1>
-
-        <!-- Client Management Section -->
-        <section id="client-management" class="mt-5">
-            <h2 class="text-secondary">Gestión de Clientes</h2>
-            <form id="cliente-form" class="p-3 border rounded bg-white shadow-sm">
-                <div class="form-group">
-                    <label for="id">ID:</label>
-                    <input type="text" id="id" name="id" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="nombre">Nombre:</label>
-                    <input type="text" id="nombre" name="nombre" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="correo">Correo:</label>
-                    <input type="email" id="correo" name="correo" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="telefono">Teléfono:</label>
-                    <input type="text" id="telefono" name="telefono" class="form-control" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Agregar Cliente</button>
-            </form>
-
-            <!-- Client Table -->
-            <h2 class="text-secondary mt-5">Lista de Clientes</h2>
-            <table class="table table-bordered table-striped mt-3">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Correo</th>
-                        <th>Teléfono</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="client-list">
-                    <!-- Client data will be populated here -->
-                </tbody>
-            </table>
-        </section>
-
-        <!-- Account Management Section -->
-        <section id="account-management" class="mt-5">
-            <h2 class="text-secondary">Gestión de Cuentas</h2>
-            <form id="account-form" class="p-3 border rounded bg-white shadow-sm">
-                <div class="form-group">
-                    <label for="account-id">Account ID:</label>
-                    <input type="text" id="account-id" name="account-id" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="account-number">Account Number:</label>
-                    <input type="text" id="account-number" name="account-number" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="account-type">Account Type:</label>
-                    <select id="account-type" name="account-type" class="form-control" required>
-                        <option value="">Selecciona el tipo de cuenta</option>
-                        <option value="1">Ahorros</option>
-                        <option value="2">Corriente</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="account-client-id">Client ID:</label>
-                    <input type="text" id="account-client-id" name="account-client-id" class="form-control" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Agregar Cuenta</button>
-            </form>
-
-            <!-- Account Table -->
-            <h2 class="text-secondary mt-5">Lista de Cuentas</h2>
-            <table class="table table-bordered table-striped mt-3">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>Account ID</th>
-                        <th>Account Number</th>
-                        <th>Account Type</th>
-                        <th>Client ID</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="account-list">
-                    <!-- Account data will be populated here -->
-                </tbody>
-            </table>
-        </section>
-
-        <!-- Transaction Management Section -->
-        <section id="transaction-management" class="mt-5">
-            <h2 class="text-secondary">Gestión de Transacciones</h2>
-            <form id="transaction-form" class="p-3 border rounded bg-white shadow-sm">
-                <div class="form-group">
-                    <label for="transaction-id">Transaction ID:</label>
-                    <input type="text" id="transaction-id" name="transaction-id" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="transaction-description">Descripción:</label>
-                    <input type="text" id="transaction-description" name="transaction-description" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="transaction-date">Fecha:</label>
-                    <input type="date" id="transaction-date" name="transaction-date" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="transaction-account-id">Account ID:</label>
-                    <input type="text" id="transaction-account-id" name="transaction-account-id" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="transaction-income">Ingreso:</label>
-                    <input type="number" id="transaction-income" name="transaction-income" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label for="transaction-expense">Gasto:</label>
-                    <input type="number" id="transaction-expense" name="transaction-expense" class="form-control">
-                </div>
-                <button type="submit" class="btn btn-primary">Agregar Transacción</button>
-            </form>
-
-            <!-- Transaction Table -->
-            <h2 class="text-secondary mt-5">Lista de Transacciones</h2>
-            <table class="table table-bordered table-striped mt-3">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>Transaction ID</th>
-                        <th>Descripción</th>
-                        <th>Fecha</th>
-                        <th>Account ID</th>
-                        <th>Ingreso</th>
-                        <th>Gasto</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="transaction-list">
-                    <!-- Transaction data will be populated here -->
-                </tbody>
-            </table>
-        </section>
-    </div>
-
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="app.js"></script> <!-- Link to your JavaScript file -->
+        </nav>
+    </header>
 </body>
 </html>

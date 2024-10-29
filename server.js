@@ -1,10 +1,10 @@
 const express = require('express');
-const cors = require('cors'); // Import the cors module
+const cors = require('cors'); // 
 const app = express();
 const apiRoutes = require('./routes/api');
 
-// Use CORS middleware
-app.use(cors()); // Enable CORS for all routes
+//
+app.use(cors()); // 
 app.use(express.json());
 app.use(express.static('public'));
 app.use('/api', apiRoutes);

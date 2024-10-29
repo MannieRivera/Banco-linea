@@ -8,11 +8,11 @@ async function getConnection() {
             connectString: '173.249.59.89:1521/ORCLCDB'
         });
 
-        console.log('Database connection established');
+        console.log('connection a base de datos exitosa..');
         return connection;
     } catch (err) {
-        console.error('Error establishing database connection:', err);
-        throw err; // Rethrow the error for handling later
+        console.error('Error al establecer coneccion:', err);
+        throw err; 
     }
 }
 
