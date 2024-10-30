@@ -30,7 +30,7 @@ router.get('/datos', async (req, res) => {
 });
 
 router.post('/cliente', async (req, res) => {
-    const { id, nombre, correo, telefono } = req.body; // Now handling the ID field too
+    const { id, nombre, correo, telefono } = req.body;
     let connection;
 
     try {
@@ -41,14 +41,14 @@ router.post('/cliente', async (req, res) => {
         const result = await connection.execute(
             `INSERT INTO cliente (id, nombre, correo, telefono) VALUES (:id, :nombre, :correo, :telefono)`,
             [id, nombre, correo, telefono],
-            { autoCommit: true } // Commit the transaction automatically
+            { autoCommit: true } 
         );
 
         console.log('Client inserted successfully:', result);
-        res.json({ message: 'Cliente agregado correctamente', result }); // Return success message
+        res.json({ message: 'Cliente agregado correctamente', result }); 
     } catch (err) {
         console.error('Error inserting client:', err);
-        res.status(500).json({ error: 'Error al agregar el cliente' }); // Return error if failed
+        res.status(500).json({ error: 'Error al agregar el cliente' });
     } finally {
         if (connection) {
             try {
@@ -67,27 +67,58 @@ router.put('/cliente/:id', async (req, res) => {
     let connection;
 
     try {
-        console.log('Connecting to the database...');
+        console.log('CONECTANDO A BASE DE DATOS...');
         connection = await getConnection();
 
-        console.log('Updating client...');
+        console.log('MODIFICANDO CLIENTE...');
         const result = await connection.execute(
             `UPDATE cliente SET nombre = :nombre, correo = :correo, telefono = :telefono WHERE id = :id`,
             [nombre, correo, telefono, id],
             { autoCommit: true } 
         );
 
-        console.log('Client updated successfully:', result);
+        console.log('Cliente creado correctamente:', result);
         res.json({ message: 'Cliente modificado correctamente', result }); 
     } catch (err) {
-        console.error('Error updating client:', err);
+        console.error('Error al modificar cliente :', err);
         res.status(500).json({ error: 'Error al modificar el cliente' }); 
     } finally {
         if (connection) {
             try {
                 await connection.close();
             } catch (err) {
-                console.error('Error closing connection:', err);
+                console.error('Error cerrando connection:', err);
+            }
+        }
+    }
+});
+
+router.delete('/cliente/:id', async (req, res) => {
+    const { id } = req.params;
+    let connection;
+
+    try {
+        console.log('Conectando a base de datos...');
+        connection = await getConnection();
+
+        console.log('Eliminando cliente...');
+        const result = await connection.execute(
+            `DELETE FROM cliente WHERE id = :id`,
+            [id],
+            { autoCommit: true }
+        );
+
+        console.log('Cliente eliminado correctamente:', result);
+        res.json({ message: 'Cliente eliminado correctamente', result });
+    } catch (err) {
+        console.error('Error al eliminar cliente:', err);
+        res.status(500).json({ error: 'Error al eliminar el cliente' });
+    } finally {
+        if (connection) {
+            try {
+                await connection.close();
+            } catch (err) {
+                console.error('Error cerrando connection:', err);
             }
         }
     }

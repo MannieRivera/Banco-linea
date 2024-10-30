@@ -14,13 +14,11 @@
     <div class="container mt-5">
         <h1 class="text-center futuristic-header mb-5">PROGRAMACION EN LA NUBE / GRUPO 3</h1>
 
-
         <div class="d-flex justify-content-center mb-4">
             <button id="fetch-data-btn" class="btn btn-primary me-3">Traer Información</button>
             <button id="clear-data-btn" class="btn btn-secondary">Limpiar Información</button>
         </div>
 
-       
         <div class="mb-4">
             <textarea id="data-container" class="form-control futuristic-textarea" rows="10" readonly></textarea>
         </div>
@@ -50,9 +48,8 @@
             <button type="submit" class="btn btn-success w-100">Agregar Cliente</button>
         </form>
 
-       
         <h2 class="text-center futuristic-subheader mb-4">Modificar Cliente</h2>
-        <form id="modify-cliente-form">
+        <form id="modify-cliente-form" class="mb-5">
             <div class="mb-3">
                 <label for="modify-id" class="form-label">ID:</label>
                 <input type="text" id="modify-id" name="modify-id" class="form-control" required>
@@ -74,6 +71,16 @@
             </div>
 
             <button type="submit" class="btn btn-warning w-100">Modificar Cliente</button>
+        </form>
+
+        <h2 class="text-center futuristic-subheader mb-4">Eliminar Cliente</h2>
+        <form id="delete-cliente-form">
+            <div class="mb-3">
+                <label for="delete-id" class="form-label">ID:</label>
+                <input type="text" id="delete-id" name="delete-id" class="form-control" required>
+            </div>
+
+            <button type="submit" class="btn btn-danger w-100">Eliminar Cliente</button>
         </form>
     </div>
 
@@ -202,6 +209,29 @@
     })
     .catch(error => {
         console.error('Error al modificar el cliente:', error);
+    });
+});
+
+
+document.getElementById('delete-cliente-form').addEventListener('submit', function(event) {
+    event.preventDefault(); 
+
+    const id = document.getElementById('delete-id').value;
+
+    fetch(`https://banco-linea-27432012ae4f.herokuapp.com/api/cliente/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Cliente eliminado:', data);
+        alert('Cliente eliminado exitosamente');
+        fetchData(); 
+    })
+    .catch(error => {
+        console.error('Error al eliminar el cliente:', error);
     });
 });
     </script>
