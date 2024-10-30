@@ -158,6 +158,25 @@ router.post('/cuentas', async (req, res) => {
     }
 });
 
+router.get('/cuentas', async (req, res) => {
+    let connection;
+    try {
+        connection = await getConnection();
+        const result = await connection.execute(
+            `SELECT c.id, c.no_cuenta, tc.descripcion AS tipo_cuenta, c.fecha_apertura, m.descripcion AS moneda, cl.nombre AS cliente
+             FROM cuenta c
+             JOIN tipos_de_cuenta tc ON c.id_tipo = tc.id
+             JOIN moneda m ON c.id_moneda = m.id
+             JOIN cliente cl ON c.id_cliente = cl.id`
+        );
+        res.json(result.rows);
+    } catch (err) {
+        res.status(500).json({ error: 'Error al obtener cuentas' });
+    } finally {
+        if (connection) await connection.close();
+    }
+});
+
 router.get('/cuentas/:no_cuenta', async (req, res) => {
     const { no_cuenta } = req.params;
     let connection;
@@ -177,6 +196,47 @@ router.get('/cuentas/:no_cuenta', async (req, res) => {
         if (connection) await connection.close();
     }
 });
+
+// Actualizar Cuenta
+router.put('/cuentas/:no_cuenta', async (req, res) => {
+    const { no_cuenta } = req.params;
+    const { id_tipo, fecha_apertura, id_moneda, id_cliente } = req.body;
+    let connection;
+    try {
+        connection = await getConnection();
+        const result = await connection.execute(
+            `UPDATE cuenta SET id_tipo = :id_tipo, fecha_apertura = :fecha_apertura, id_moneda = :id_moneda, id_cliente = :id_cliente 
+             WHERE no_cuenta = :no_cuenta`,
+            [id_tipo, fecha_apertura, id_moneda, id_cliente, no_cuenta],
+            { autoCommit: true }
+        );
+        res.json({ message: 'Cuenta actualizada correctamente', result });
+    } catch (err) {
+        res.status(500).json({ error: 'Error al actualizar cuenta' });
+    } finally {
+        if (connection) await connection.close();
+    }
+});
+
+// Eliminar Cuenta
+router.delete('/cuentas/:no_cuenta', async (req, res) => {
+    const { no_cuenta } = req.params;
+    let connection;
+    try {
+        connection = await getConnection();
+        const result = await connection.execute(
+            `DELETE FROM cuenta WHERE no_cuenta = :no_cuenta`,
+            [no_cuenta],
+            { autoCommit: true }
+        );
+        res.json({ message: 'Cuenta eliminada correctamente', result });
+    } catch (err) {
+        res.status(500).json({ error: 'Error al eliminar cuenta' });
+    } finally {
+        if (connection) await connection.close();
+    }
+});
+
 
 // CRUD moneda
 router.get('/monedas', async (req, res) => {
@@ -232,6 +292,97 @@ router.get('/cliente-informacion/:no_cuenta', async (req, res) => {
         res.json(result.rows);
     } catch (err) {
         res.status(500).json({ error: 'Error al obtener información del cliente' });
+    } finally {
+        if (connection) await connection.close();
+    }
+});
+
+router.post('/movimientos', async (req, res) => {
+    const { id, descripcion, fecha, id_cuenta, ingresos, egresos } = req.body;
+    let connection;
+    try {
+        connection = await getConnection();
+        const result = await connection.execute(
+            `INSERT INTO movimientos (id, descripcion, fecha, id_cuenta, ingresos, egresos) 
+             VALUES (:id, :descripcion, :fecha, :id_cuenta, :ingresos, :egresos)`,
+            [id, descripcion, fecha, id_cuenta, ingresos, egresos],
+            { autoCommit: true }
+        );
+        res.json({ message: 'Movimiento creado correctamente', result });
+    } catch (err) {
+        res.status(500).json({ error: 'Error al crear movimiento' });
+    } finally {
+        if (connection) await connection.close();
+    }
+});
+
+// Obtener todos los movimientos (GET) los movimientos empiezan aqui.
+router.get('/movimientos', async (req, res) => {
+    let connection;
+    try {
+        connection = await getConnection();
+        const result = await connection.execute(`SELECT * FROM movimientos`);
+        res.json(result.rows);
+    } catch (err) {
+        res.status(500).json({ error: 'Error al obtener movimientos' });
+    } finally {
+        if (connection) await connection.close();
+    }
+});
+
+// Obtener movimientos de una cuenta específica (GET)
+router.get('/movimientos/:id_cuenta', async (req, res) => {
+    const { id_cuenta } = req.params;
+    let connection;
+    try {
+        connection = await getConnection();
+        const result = await connection.execute(
+            `SELECT * FROM movimientos WHERE id_cuenta = :id_cuenta`,
+            [id_cuenta]
+        );
+        res.json(result.rows);
+    } catch (err) {
+        res.status(500).json({ error: 'Error al obtener movimientos de la cuenta' });
+    } finally {
+        if (connection) await connection.close();
+    }
+});
+
+// Actualizar un movimiento (PUT)
+router.put('/movimientos/:id', async (req, res) => {
+    const { id } = req.params;
+    const { descripcion, fecha, id_cuenta, ingresos, egresos } = req.body;
+    let connection;
+    try {
+        connection = await getConnection();
+        const result = await connection.execute(
+            `UPDATE movimientos SET descripcion = :descripcion, fecha = :fecha, id_cuenta = :id_cuenta, 
+             ingresos = :ingresos, egresos = :egresos WHERE id = :id`,
+            [descripcion, fecha, id_cuenta, ingresos, egresos, id],
+            { autoCommit: true }
+        );
+        res.json({ message: 'Movimiento actualizado correctamente', result });
+    } catch (err) {
+        res.status(500).json({ error: 'Error al actualizar movimiento' });
+    } finally {
+        if (connection) await connection.close();
+    }
+});
+
+// Eliminar un movimiento (DELETE)
+router.delete('/movimientos/:id', async (req, res) => {
+    const { id } = req.params;
+    let connection;
+    try {
+        connection = await getConnection();
+        const result = await connection.execute(
+            `DELETE FROM movimientos WHERE id = :id`,
+            [id],
+            { autoCommit: true }
+        );
+        res.json({ message: 'Movimiento eliminado correctamente', result });
+    } catch (err) {
+        res.status(500).json({ error: 'Error al eliminar movimiento' });
     } finally {
         if (connection) await connection.close();
     }
