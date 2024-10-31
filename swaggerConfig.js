@@ -11,7 +11,7 @@ const options = {
         },
         servers: [
             {
-                url: 'https://banco-linea.onrender.com/api'
+                url: 'https://banco-linea.onrender.com/api',
             }
         ]
     },
