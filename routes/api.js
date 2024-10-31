@@ -2,8 +2,36 @@ const express = require('express');
 const router = express.Router();
 const { getConnection } = require('../db/database');
 
-
-router.get('/datos', async (req, res) => {
+/**
+ * @swagger
+ * /Clientes:
+ *   get:
+ *     summary: Retorna lista de los clientes.
+ *     responses:
+ *       200:
+ *         description: Lista de clientes.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   ID:
+ *                     type: integer
+ *                   NOMBRE:
+ *                     type: string
+ *                   CORREO:
+ *                     type: string
+ *                   TELEFONO:
+ *                     type: string
+ *     Respuestas:
+ *       200:
+ *         description: Se retorna la información.
+ *       500:
+ *         description: Error interno de servidor será necesario de validar errores.
+ */
+/*router.get('/datos', async (req, res) => {
     let connection;
 
     try {
@@ -27,8 +55,69 @@ router.get('/datos', async (req, res) => {
             }
         }
     }
+}); */
+router.get('/clientes', async (req, res) => {
+    let connection;
+
+    try {
+        console.log('Conectando a base de datos...');
+        connection = await getConnection();
+
+        console.log('Ejecutando el query...');
+        const result = await connection.execute('SELECT ID, NOMBRE, CORREO, TELEFONO FROM cliente');
+
+        console.log('Query ejecutada correctamente:', result);
+
+        // Transformar los datos en el formato deseado
+        const transformedData = result.rows.map(row => ({
+            id: row[0],         // ID
+            nombre: row[1],     // NOMBRE
+            correo: row[2],     // CORREO
+            telefono: row[3]    // TELEFONO
+        }));
+
+        // Enviar los datos transformados como respuesta
+        res.json(transformedData);
+    } catch (err) {
+        console.error('Error al ejecutar el query:', err);
+        res.status(500).send('Error en la base de datos');
+    } finally {
+        if (connection) {
+            try {
+                await connection.close();
+            } catch (err) {
+                console.error('Error cerrando conexión:', err);
+            }
+        }
+    }
 });
 
+/**
+ * @swagger
+ * /cliente:
+ *   post:
+ *     summary: Agrega un nuevo cliente.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: integer
+ *               nombre:
+ *                 type: string
+ *               correo:
+ *                 type: string
+ *               telefono:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Cliente agregado correctamente.
+ *       500:
+ *         description: Error al agregar el cliente.
+ */
 router.post('/cliente', async (req, res) => {
     const { id, nombre, correo, telefono } = req.body;
     let connection;
@@ -60,7 +149,36 @@ router.post('/cliente', async (req, res) => {
     }
 });
 
-
+/**
+ * @swagger
+ * /cliente/{id}:
+ *   put:
+ *     summary: Modifica un cliente existente.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nombre:
+ *                 type: string
+ *               correo:
+ *                 type: string
+ *               telefono:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Cliente modificado correctamente.
+ *       500:
+ *         description: Error al modificar el cliente.
+ */
 router.put('/cliente/:id', async (req, res) => {
     const { id } = req.params; 
     const { nombre, correo, telefono } = req.body; 
@@ -92,7 +210,23 @@ router.put('/cliente/:id', async (req, res) => {
         }
     }
 });
-
+/**
+ * @swagger
+ * /cliente/{id}:
+ *   delete:
+ *     summary: Elimina un cliente.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Cliente eliminado correctamente.
+ *       500:
+ *         description: Error al eliminar el cliente.
+ */
 router.delete('/cliente/:id', async (req, res) => {
     const { id } = req.params;
     let connection;
@@ -124,7 +258,17 @@ router.delete('/cliente/:id', async (req, res) => {
     }
 });
 
-// CRUD para la tabla tipos_de_cuenta
+/**
+ * @swagger
+ * /tipos-de-cuenta:
+ *   get:
+ *     summary: Obtiene la lista de tipos de cuenta.
+ *     responses:
+ *       200:
+ *         description: Lista de tipos de cuenta.
+ *       500:
+ *         description: Error al obtener tipos de cuenta.
+ */
 router.get('/tipos-de-cuenta', async (req, res) => {
     let connection;
     try {
@@ -138,7 +282,38 @@ router.get('/tipos-de-cuenta', async (req, res) => {
     }
 });
 
-// CRUD para la tabla cuenta
+/**
+ * @swagger
+ * /cuentas:
+ *   post:
+ *     summary: Crea una nueva cuenta.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: integer
+ *               no_cuenta:
+ *                 type: string
+ *               id_tipo:
+ *                 type: integer
+ *               fecha_apertura:
+ *                 type: string
+ *                 format: date
+ *               id_moneda:
+ *                 type: integer
+ *               id_cliente:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Cuenta creada correctamente.
+ *       500:
+ *         description: Error al crear cuenta.
+ */
+
 router.post('/cuentas', async (req, res) => {
     const { id, no_cuenta, id_tipo, fecha_apertura, id_moneda, id_cliente } = req.body;
     let connection;
@@ -157,7 +332,17 @@ router.post('/cuentas', async (req, res) => {
         if (connection) await connection.close();
     }
 });
-
+/**
+ * @swagger
+ * /cuentas:
+ *   get:
+ *     summary: Obtiene la lista de cuentas.
+ *     responses:
+ *       200:
+ *         description: Lista de cuentas.
+ *       500:
+ *         description: Error al obtener cuentas.
+ */
 router.get('/cuentas', async (req, res) => {
     let connection;
     try {
@@ -169,14 +354,43 @@ router.get('/cuentas', async (req, res) => {
              JOIN moneda m ON c.id_moneda = m.id
              JOIN cliente cl ON c.id_cliente = cl.id`
         );
-        res.json(result.rows);
+
+        // Estructura más descriptiva de los datos
+        const cuentas = result.rows.map(row => ({
+            id: row[0],                    // ID de la cuenta
+            noCuenta: row[1],              // Número de cuenta
+            tipoCuenta: row[2],            // Descripción del tipo de cuenta
+            fechaApertura: row[3],         // Fecha de apertura
+            moneda: row[4],                // Descripción de la moneda
+            cliente: row[5]                // Nombre del cliente
+        }));
+
+        res.json(cuentas);
     } catch (err) {
+        console.error('Error al obtener cuentas:', err);
         res.status(500).json({ error: 'Error al obtener cuentas' });
     } finally {
         if (connection) await connection.close();
     }
 });
 
+/**
+ * @swagger
+ * /cuentas/{no_cuenta}:
+ *   get:
+ *     summary: Obtiene información de una cuenta por número de cuenta.
+ *     parameters:
+ *       - in: path
+ *         name: no_cuenta
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Información de la cuenta.
+ *       500:
+ *         description: Error al obtener la cuenta.
+ */
 router.get('/cuentas/:no_cuenta', async (req, res) => {
     const { no_cuenta } = req.params;
     let connection;
@@ -197,7 +411,39 @@ router.get('/cuentas/:no_cuenta', async (req, res) => {
     }
 });
 
-// Actualizar Cuenta
+/**
+ * @swagger
+ * /cuentas/{no_cuenta}:
+ *   put:
+ *     summary: Actualiza una cuenta existente.
+ *     parameters:
+ *       - name: no_cuenta
+ *         in: path
+ *         required: true
+ *         description: Número de cuenta a actualizar.
+ *         schema:
+ *           type: string
+ *       - name: body
+ *         in: body
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             id_tipo:
+ *               type: integer
+ *             fecha_apertura:
+ *               type: string
+ *               format: date
+ *             id_moneda:
+ *               type: integer
+ *             id_cliente:
+ *               type: integer
+ *     responses:
+ *       200:
+ *         description: Cuenta actualizada correctamente.
+ *       500:
+ *         description: Error al actualizar cuenta.
+ */
 router.put('/cuentas/:no_cuenta', async (req, res) => {
     const { no_cuenta } = req.params;
     const { id_tipo, fecha_apertura, id_moneda, id_cliente } = req.body;
@@ -218,7 +464,24 @@ router.put('/cuentas/:no_cuenta', async (req, res) => {
     }
 });
 
-// Eliminar Cuenta
+/**
+ * @swagger
+ * /cuentas/{no_cuenta}:
+ *   delete:
+ *     summary: Elimina una cuenta existente.
+ *     parameters:
+ *       - name: no_cuenta
+ *         in: path
+ *         required: true
+ *         description: Número de cuenta a eliminar.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Cuenta eliminada correctamente.
+ *       500:
+ *         description: Error al eliminar cuenta.
+ */
 router.delete('/cuentas/:no_cuenta', async (req, res) => {
     const { no_cuenta } = req.params;
     let connection;
@@ -238,7 +501,17 @@ router.delete('/cuentas/:no_cuenta', async (req, res) => {
 });
 
 
-// CRUD moneda
+/**
+ * @swagger
+ * /monedas:
+ *   get:
+ *     summary: Obtiene la lista de monedas.
+ *     responses:
+ *       200:
+ *         description: Lista de monedas.
+ *       500:
+ *         description: Error al obtener monedas.
+ */
 router.get('/monedas', async (req, res) => {
     let connection;
     try {
@@ -252,7 +525,24 @@ router.get('/monedas', async (req, res) => {
     }
 });
 
-// CRUDmovimientos
+/**
+ * @swagger
+ * /movimientos/{no_cuenta}:
+ *   get:
+ *     summary: Obtiene la lista de movimientos de una cuenta específica.
+ *     parameters:
+ *       - name: no_cuenta
+ *         in: path
+ *         required: true
+ *         description: Número de cuenta para obtener movimientos.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Lista de movimientos.
+ *       500:
+ *         description: Error al obtener movimientos.
+ */
 router.get('/movimientos/:no_cuenta', async (req, res) => {
     const { no_cuenta } = req.params;
     let connection;
@@ -273,7 +563,24 @@ router.get('/movimientos/:no_cuenta', async (req, res) => {
     }
 });
 
-
+/**
+ * @swagger
+ * /cliente-informacion/{no_cuenta}:
+ *   get:
+ *     summary: Obtiene información del cliente y movimientos relacionados.
+ *     parameters:
+ *       - name: no_cuenta
+ *         in: path
+ *         required: true
+ *         description: Número de cuenta para obtener información del cliente.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Información del cliente y movimientos.
+ *       500:
+ *         description: Error al obtener información del cliente.
+ */
 router.get('/cliente-informacion/:no_cuenta', async (req, res) => {
     const { no_cuenta } = req.params;
     let connection;
@@ -296,7 +603,37 @@ router.get('/cliente-informacion/:no_cuenta', async (req, res) => {
         if (connection) await connection.close();
     }
 });
-
+/**
+ * @swagger
+ * /movimientos:
+ *   post:
+ *     summary: Crea un nuevo movimiento.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: integer
+ *               descripcion:
+ *                 type: string
+ *               fecha:
+ *                 type: string
+ *                 format: date
+ *               id_cuenta:
+ *                 type: integer
+ *               ingresos:
+ *                 type: number
+ *               egresos:
+ *                 type: number
+ *     responses:
+ *       200:
+ *         description: Movimiento creado correctamente.
+ *       500:
+ *         description: Error al crear movimiento.
+ */
 router.post('/movimientos', async (req, res) => {
     const { id, descripcion, fecha, id_cuenta, ingresos, egresos } = req.body;
     let connection;
@@ -316,21 +653,62 @@ router.post('/movimientos', async (req, res) => {
     }
 });
 
-// Obtener todos los movimientos (GET) los movimientos empiezan aqui.
+/**
+ * @swagger
+ * /movimientos:
+ *   get:
+ *     summary: Obtiene todos los movimientos.
+ *     responses:
+ *       200:
+ *         description: Lista de movimientos.
+ *       500:
+ *         description: Error al obtener movimientos.
+ */
 router.get('/movimientos', async (req, res) => {
     let connection;
     try {
         connection = await getConnection();
-        const result = await connection.execute(`SELECT * FROM movimientos`);
-        res.json(result.rows);
+        const result = await connection.execute(`SELECT id, descripcion, fecha, id_cuenta, ingresos, egresos FROM movimientos`);
+
+        // Transformar los datos en el formato deseado
+        const transformedData = result.rows.map(row => ({
+            id: row[0],          // ID del movimiento
+            descripcion: row[1],  // Descripción del movimiento
+            fecha: row[2],        // Fecha del movimiento
+            idCuenta: row[3],     // ID de la cuenta asociada
+            ingresos: row[4],     // Monto de ingresos
+            egresos: row[5]       // Monto de egresos
+        }));
+
+        // Enviar los datos transformados como respuesta
+        res.json(transformedData);
     } catch (err) {
+        console.error('Error al obtener movimientos:', err);
         res.status(500).json({ error: 'Error al obtener movimientos' });
     } finally {
         if (connection) await connection.close();
     }
 });
 
-// Obtener movimientos de una cuenta específica (GET)
+
+/**
+ * @swagger
+ * /movimientos/{id_cuenta}:
+ *   get:
+ *     summary: Obtiene movimientos de una cuenta específica.
+ *     parameters:
+ *       - name: id_cuenta
+ *         in: path
+ *         required: true
+ *         description: ID de la cuenta para obtener movimientos.
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Lista de movimientos de la cuenta.
+ *       500:
+ *         description: Error al obtener movimientos de la cuenta.
+ */
 router.get('/movimientos/:id_cuenta', async (req, res) => {
     const { id_cuenta } = req.params;
     let connection;
@@ -348,7 +726,41 @@ router.get('/movimientos/:id_cuenta', async (req, res) => {
     }
 });
 
-// Actualizar un movimiento (PUT)
+/**
+ * @swagger
+ * /movimientos/{id}:
+ *   put:
+ *     summary: Actualiza un movimiento existente.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID del movimiento a actualizar.
+ *         schema:
+ *           type: integer
+ *       - name: body
+ *         in: body
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             descripcion:
+ *               type: string
+ *             fecha:
+ *               type: string
+ *               format: date
+ *             id_cuenta:
+ *               type: integer
+ *             ingresos:
+ *               type: number
+ *             egresos:
+ *               type: number
+ *     responses:
+ *       200:
+ *         description: Movimiento actualizado correctamente.
+ *       500:
+ *         description: Error al actualizar movimiento.
+ */
 router.put('/movimientos/:id', async (req, res) => {
     const { id } = req.params;
     const { descripcion, fecha, id_cuenta, ingresos, egresos } = req.body;
@@ -369,7 +781,24 @@ router.put('/movimientos/:id', async (req, res) => {
     }
 });
 
-// Eliminar un movimiento (DELETE)
+/**
+ * @swagger
+ * /movimientos/{id}:
+ *   delete:
+ *     summary: Elimina un movimiento existente.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID del movimiento a eliminar.
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Movimiento eliminado correctamente.
+ *       500:
+ *         description: Error al eliminar movimiento.
+ */
 router.delete('/movimientos/:id', async (req, res) => {
     const { id } = req.params;
     let connection;
