@@ -10,57 +10,14 @@ const { getConnection } = require('../db/database');
  * @swagger
  * /clientes:
  *   get:
- *     summary: Retorna lista de los clientes.
+ *     summary: Obtiene la lista de los clientes.
  *     tags: [Clientes]
  *     responses:
  *       200:
- *         description: Lista de clientes.
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   ID:
- *                     type: integer
- *                   NOMBRE:
- *                     type: string
- *                   CORREO:
- *                     type: string
- *                   TELEFONO:
- *                     type: string
- *     Respuestas:
- *       200:
- *         description: Se retorna la información.
+ *         description: Lista de clientes exitosa.
  *       500:
- *         description: Error interno de servidor será necesario de validar errores.
+ *         description: Error al obtener la lista de clientes.
  */
-/*router.get('/datos', async (req, res) => {
-    let connection;
-
-    try {
-        console.log('Conectando a base de datos...');
-        connection = await getConnection();
-
-        console.log('Ejecutando el query...');
-        const result = await connection.execute('SELECT ID, NOMBRE, CORREO, TELEFONO FROM cliente');
-
-        console.log('Query ejecutada correctamente:', result);
-        res.json(result.rows);
-    } catch (err) {
-        console.error('Error al ejecutar el query:', err);
-        res.status(500).send('Error en la base de datos');
-    } finally {
-        if (connection) {
-            try {
-                await connection.close();
-            } catch (err) {
-                console.error('Error coneccion cerrada:', err);
-            }
-        }
-    }
-}); */
 router.get('/clientes', async (req, res) => {
     let connection;
 
