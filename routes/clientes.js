@@ -15,7 +15,7 @@ const { getConnection } = require('../db/database');
 
 /**
  * @swagger
- * /Clientes:
+ * /clientes:
  *   get:
  *     summary: Retorna lista de los clientes.
  *     tags: [Clientes]
