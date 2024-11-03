@@ -228,7 +228,7 @@ router.delete('/cliente/:id', async (req, res) => {
  * /tipos-de-cuenta:
  *   get:
  *     summary: Obtiene la lista de tipos de cuenta.
- *     tags: [Cuentas]
+ *     tags: [Tipos de Cuentas]
  *     responses:
  *       200:
  *         description: Lista de tipos de cuenta.
@@ -243,6 +243,129 @@ router.get('/tipos-de-cuenta', async (req, res) => {
         res.json(result.rows);
     } catch (err) {
         res.status(500).json({ error: 'Error al obtener tipos de cuenta' });
+    } finally {
+        if (connection) await connection.close();
+    }
+});
+/**
+ * @swagger
+ * /tipos-de-cuenta:
+ *   post:
+ *     summary: Crea un nuevo tipo de cuenta.
+ *     tags: [Tipos de Cuentas]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: integer
+ *               descripcion:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Tipo de cuenta creado correctamente.
+ *       500:
+ *         description: Error al crear tipo de cuenta.
+ */
+router.post('/tipos-de-cuenta', async (req, res) => {
+    const { id, descripcion } = req.body;
+    let connection;
+    try {
+        connection = await getConnection();
+        const result = await connection.execute(
+            `INSERT INTO tipos_de_cuenta (id, descripcion) VALUES (:id, :descripcion)`,
+            [id, descripcion],
+            { autoCommit: true }
+        );
+        res.json({ message: 'Tipo de cuenta creado correctamente', result });
+    } catch (err) {
+        res.status(500).json({ error: 'Error al crear tipo de cuenta' });
+    } finally {
+        if (connection) await connection.close();
+    }
+});
+
+/**
+ * @swagger
+ * /tipos-de-cuenta/{id}:
+ *   put:
+ *     summary: Actualiza un tipo de cuenta existente.
+ *     tags: [Tipos de Cuentas]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID del tipo de cuenta a actualizar.
+ *         schema:
+ *           type: integer
+ *       - name: body
+ *         in: body
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             descripcion:
+ *               type: string
+ *     responses:
+ *       200:
+ *         description: Tipo de cuenta actualizado correctamente.
+ *       500:
+ *         description: Error al actualizar tipo de cuenta.
+ */
+router.put('/tipos-de-cuenta/:id', async (req, res) => {
+    const { id } = req.params;
+    const { descripcion } = req.body;
+    let connection;
+    try {
+        connection = await getConnection();
+        const result = await connection.execute(
+            `UPDATE tipos_de_cuenta SET descripcion = :descripcion WHERE id = :id`,
+            [descripcion, id],
+            { autoCommit: true }
+        );
+        res.json({ message: 'Tipo de cuenta actualizado correctamente', result });
+    } catch (err) {
+        res.status(500).json({ error: 'Error al actualizar tipo de cuenta' });
+    } finally {
+        if (connection) await connection.close();
+    }
+});
+
+/**
+ * @swagger
+ * /tipos-de-cuenta/{id}:
+ *   delete:
+ *     summary: Elimina un tipo de cuenta existente.
+ *     tags: [Tipos de Cuentas]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID del tipo de cuenta a eliminar.
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Tipo de cuenta eliminado correctamente.
+ *       500:
+ *         description: Error al eliminar tipo de cuenta.
+ */
+router.delete('/tipos-de-cuenta/:id', async (req, res) => {
+    const { id } = req.params;
+    let connection;
+    try {
+        connection = await getConnection();
+        const result = await connection.execute(
+            `DELETE FROM tipos_de_cuenta WHERE id = :id`,
+            [id],
+            { autoCommit: true }
+        );
+        res.json({ message: 'Tipo de cuenta eliminado correctamente', result });
+    } catch (err) {
+        res.status(500).json({ error: 'Error al eliminar tipo de cuenta' });
     } finally {
         if (connection) await connection.close();
     }
@@ -472,30 +595,7 @@ router.delete('/cuentas/:no_cuenta', async (req, res) => {
 });
 
 
-/**
- * @swagger
- * /monedas:
- *   get:
- *     summary: Obtiene la lista de monedas.
- *     tags: [Cuentas]
- *     responses:
- *       200:
- *         description: Lista de monedas.
- *       500:
- *         description: Error al obtener monedas.
- */
-router.get('/monedas', async (req, res) => {
-    let connection;
-    try {
-        connection = await getConnection();
-        const result = await connection.execute('SELECT id, descripcion FROM moneda');
-        res.json(result.rows);
-    } catch (err) {
-        res.status(500).json({ error: 'Error al obtener monedas' });
-    } finally {
-        if (connection) await connection.close();
-    }
-});
+
 
 /**
  * @swagger
@@ -792,6 +892,154 @@ router.delete('/movimientos/:id', async (req, res) => {
         res.json({ message: 'Movimiento eliminado correctamente', result });
     } catch (err) {
         res.status(500).json({ error: 'Error al eliminar movimiento' });
+    } finally {
+        if (connection) await connection.close();
+    }
+});
+
+/**
+ * @swagger
+ * /monedas:
+ *   get:
+ *     summary: Obtiene la lista de monedas.
+ *     tags: [Monedas]
+ *     responses:
+ *       200:
+ *         description: Lista de monedas.
+ *       500:
+ *         description: Error al obtener monedas.
+ */
+router.get('/monedas', async (req, res) => {
+    let connection;
+    try {
+        connection = await getConnection();
+        const result = await connection.execute('SELECT id, descripcion FROM moneda');
+        res.json(result.rows);
+    } catch (err) {
+        res.status(500).json({ error: 'Error al obtener monedas' });
+    } finally {
+        if (connection) await connection.close();
+    }
+});
+/**
+ * @swagger
+ * /monedas:
+ *   post:
+ *     summary: Crea una nueva moneda.
+ *     tags: [Monedas]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: integer
+ *               descripcion:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Moneda creada correctamente.
+ *       500:
+ *         description: Error al crear moneda.
+ */
+router.post('/monedas', async (req, res) => {
+    const { id, descripcion } = req.body;
+    let connection;
+    try {
+        connection = await getConnection();
+        const result = await connection.execute(
+            `INSERT INTO moneda (id, descripcion) VALUES (:id, :descripcion)`,
+            [id, descripcion],
+            { autoCommit: true }
+        );
+        res.json({ message: 'Moneda creada correctamente', result });
+    } catch (err) {
+        res.status(500).json({ error: 'Error al crear moneda' });
+    } finally {
+        if (connection) await connection.close();
+    }
+});
+
+/**
+ * @swagger
+ * /monedas/{id}:
+ *   delete:
+ *     summary: Elimina una moneda existente.
+ *     tags: [Monedas]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID de la moneda a eliminar.
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Moneda eliminada correctamente.
+ *       500:
+ *         description: Error al eliminar moneda.
+ */
+router.delete('/monedas/:id', async (req, res) => {
+    const { id } = req.params;
+    let connection;
+    try {
+        connection = await getConnection();
+        const result = await connection.execute(
+            `DELETE FROM moneda WHERE id = :id`,
+            [id],
+            { autoCommit: true }
+        );
+        res.json({ message: 'Moneda eliminada correctamente', result });
+    } catch (err) {
+        res.status(500).json({ error: 'Error al eliminar moneda' });
+    } finally {
+        if (connection) await connection.close();
+    }
+});
+
+/**
+ * @swagger
+ * /monedas/{id}:
+ *   put:
+ *     summary: Actualiza una moneda existente.
+ *     tags: [Monedas]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID de la moneda a actualizar.
+ *         schema:
+ *           type: integer
+ *       - name: body
+ *         in: body
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             descripcion:
+ *               type: string
+ *     responses:
+ *       200:
+ *         description: Moneda actualizada correctamente.
+ *       500:
+ *         description: Error al actualizar moneda.
+ */
+router.put('/monedas/:id', async (req, res) => {
+    const { id } = req.params;
+    const { descripcion } = req.body;
+    let connection;
+    try {
+        connection = await getConnection();
+        const result = await connection.execute(
+            `UPDATE moneda SET descripcion = :descripcion WHERE id = :id`,
+            [descripcion, id],
+            { autoCommit: true }
+        );
+        res.json({ message: 'Moneda actualizada correctamente', result });
+    } catch (err) {
+        res.status(500).json({ error: 'Error al actualizar moneda' });
     } finally {
         if (connection) await connection.close();
     }
