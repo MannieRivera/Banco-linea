@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { getConnection } = require('../db/database');
+const { verifyToken } = require('./authMiddleware');
+
 
 
 
@@ -174,6 +176,7 @@ router.put('/cliente/:id', async (req, res) => {
         }
     }
 });
+
 /**
  * @swagger
  * /cliente/{id}:
@@ -192,7 +195,7 @@ router.put('/cliente/:id', async (req, res) => {
  *       500:
  *         description: Error al eliminar el cliente.
  */
-router.delete('/cliente/:id', async (req, res) => {
+router.delete('/cliente/:id', async (req, res) => { // Middleware removed
     const { id } = req.params;
     let connection;
 
@@ -207,8 +210,12 @@ router.delete('/cliente/:id', async (req, res) => {
             { autoCommit: true }
         );
 
+        if (result.rowsAffected === 0) {
+            return res.status(404).json({ error: 'Cliente no encontrado' });
+        }
+
         console.log('Cliente eliminado correctamente:', result);
-        res.json({ message: 'Cliente eliminado correctamente', result });
+        res.json({ message: 'Cliente eliminado correctamente' });
     } catch (err) {
         console.error('Error al eliminar cliente:', err);
         res.status(500).json({ error: 'Error al eliminar el cliente' });
@@ -217,11 +224,12 @@ router.delete('/cliente/:id', async (req, res) => {
             try {
                 await connection.close();
             } catch (err) {
-                console.error('Error cerrando connection:', err);
+                console.error('Error cerrando conexión:', err);
             }
         }
     }
 });
+
 
 /**
  * @swagger
@@ -788,21 +796,22 @@ router.get('/movimientos', async (req, res) => {
  *         description: Error al obtener movimientos de la cuenta.
  */
 router.get('/movimientos/:id_cuenta', async (req, res) => {
-    const { id_cuenta } = req.params;
+    const { id_cuenta } = req.params;  
     let connection;
     try {
         connection = await getConnection();
         const result = await connection.execute(
             `SELECT * FROM movimientos WHERE id_cuenta = :id_cuenta`,
-            [id_cuenta]
+            { id_cuenta: id_cuenta } 
         );
-        res.json(result.rows);
+        res.json(result.rows); 
     } catch (err) {
         res.status(500).json({ error: 'Error al obtener movimientos de la cuenta' });
     } finally {
         if (connection) await connection.close();
     }
 });
+
 
 /**
  * @swagger

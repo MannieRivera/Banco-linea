@@ -3,12 +3,16 @@ const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpecs = require('./swaggerConfig');
 const apiRoutes = require('./routes/api');
+const { verifyToken } = require('./routes/authMiddleware');
+
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
+app.use('/api/protected-route', verifyToken, apiRoutes);
+
 
 // Swagger setup
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
