@@ -694,7 +694,21 @@ router.get('/cliente-informacion/:no_cuenta', async (req, res) => {
              WHERE c.no_cuenta = :no_cuenta`,
             [no_cuenta]
         );
-        res.json(result.rows);
+
+        const transformedData = result.rows.map(row => ({
+            noCuenta: row[0],                // Número de cuenta
+            fechaApertura: row[1],           // Fecha de apertura
+            tipoCuenta: row[2],              // Tipo de cuenta
+            nombreCliente: row[3],           // Nombre del cliente
+            correoCliente: row[4],           // Correo del cliente
+            telefonoCliente: row[5],         // Teléfono del cliente
+            descripcionMovimiento: row[6],   // Descripción del movimiento
+            fechaMovimiento: row[7],         // Fecha del movimiento
+            ingresos: row[8],                // Ingresos
+            egresos: row[9]                  // Egresos
+        }));
+
+        res.json(transformedData);
     } catch (err) {
         res.status(500).json({ error: 'Error al obtener información del cliente' });
     } finally {
