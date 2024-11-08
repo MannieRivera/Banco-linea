@@ -248,7 +248,14 @@ router.get('/tipos-de-cuenta', async (req, res) => {
     try {
         connection = await getConnection();
         const result = await connection.execute('SELECT id, descripcion FROM tipos_de_cuenta');
-        res.json(result.rows);
+        
+        // Transformar los datos en el formato deseado
+        const transformedData = result.rows.map(row => ({
+            id: row[0],          // ID del tipo de cuenta
+            descripcion: row[1]  // Descripción del tipo de cuenta
+        }));
+
+        res.json(transformedData);
     } catch (err) {
         res.status(500).json({ error: 'Error al obtener tipos de cuenta' });
     } finally {
@@ -331,7 +338,7 @@ router.put('/tipos-de-cuenta/:id', async (req, res) => {
         connection = await getConnection();
         const result = await connection.execute(
             `UPDATE tipos_de_cuenta SET descripcion = :descripcion WHERE id = :id`,
-            [descripcion, id],
+            { descripcion, id },
             { autoCommit: true }
         );
         res.json({ message: 'Tipo de cuenta actualizado correctamente', result });
@@ -636,7 +643,16 @@ router.get('/movimientos/:no_cuenta', async (req, res) => {
              WHERE c.no_cuenta = :no_cuenta`,
             [no_cuenta]
         );
-        res.json(result.rows);
+
+      
+        const transformedData = result.rows.map(row => ({
+            descripcion: row[0],  
+            fecha: row[1],       
+            ingresos: row[2],     
+            egresos: row[3]      
+        }));
+
+        res.json(transformedData);
     } catch (err) {
         res.status(500).json({ error: 'Error al obtener movimientos' });
     } finally {
@@ -923,7 +939,14 @@ router.get('/monedas', async (req, res) => {
     try {
         connection = await getConnection();
         const result = await connection.execute('SELECT id, descripcion FROM moneda');
-        res.json(result.rows);
+        
+       
+        const transformedData = result.rows.map(row => ({
+            id: row[0],          
+            descripcion: row[1]  
+        }));
+
+        res.json(transformedData);
     } catch (err) {
         res.status(500).json({ error: 'Error al obtener monedas' });
     } finally {
@@ -1039,20 +1062,41 @@ router.put('/monedas/:id', async (req, res) => {
     const { id } = req.params;
     const { descripcion } = req.body;
     let connection;
+
+    console.log(`Received ID: ${id}`); // Debug: Check if ID is received correctly
+    console.log(`Received descripcion: ${descripcion}`); // Debug: Check if descripcion is received correctly
+
     try {
         connection = await getConnection();
+
         const result = await connection.execute(
             `UPDATE moneda SET descripcion = :descripcion WHERE id = :id`,
-            [descripcion, id],
+            { descripcion: descripcion, id: id }, // Use named bindings for clarity
             { autoCommit: true }
         );
+
+        // Debug: Check the result of the update operation
+        console.log('Update result:', result);
+
+        if (result.rowsAffected === 0) {
+            return res.status(404).json({ error: 'Moneda no encontrada' });
+        }
+
         res.json({ message: 'Moneda actualizada correctamente', result });
     } catch (err) {
+        console.error('Error al actualizar moneda:', err); // Detailed error logging
         res.status(500).json({ error: 'Error al actualizar moneda' });
     } finally {
-        if (connection) await connection.close();
+        if (connection) {
+            try {
+                await connection.close();
+            } catch (err) {
+                console.error('Error cerrando conexión:', err);
+            }
+        }
     }
 });
+
 
 
 module.exports = router;
