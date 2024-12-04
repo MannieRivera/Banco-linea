@@ -283,8 +283,30 @@ router.delete('/cliente/:id', async (req, res) => {
             return res.status(404).json({ error: 'Cliente no encontrado' });
         }
 
-        console.log('Cliente eliminado correctamente:', result);
-        res.json({ message: 'Cliente eliminado correctamente' });
+        console.log('Cliente eliminado correctamente de la base de datos:', result);
+
+       
+        const route1Data = {
+            table: "cliente",
+            condition: `id=${id}`
+        };
+
+        console.log('Eliminando cliente en la primera ruta...');
+        await axios.post('https://eo2pkwqau6mfnmf.m.pipedream.net', route1Data);
+        console.log('Cliente eliminado correctamente en la primera ruta.');
+
+       
+        const route2Data = {
+            operacion: "BORRAR",
+            table: "cliente",
+            conditions: `id=${id}`
+        };
+
+        console.log('Eliminando cliente en la segunda ruta...');
+        await axios.post('https://eo6du7tmpym4zor.m.pipedream.net', route2Data);
+        console.log('Cliente eliminado correctamente en la segunda ruta.');
+
+        res.json({ message: 'Cliente eliminado correctamente en todas las rutas' });
     } catch (err) {
         console.error('Error al eliminar cliente:', err);
         res.status(500).json({ error: 'Error al eliminar el cliente' });
@@ -298,6 +320,7 @@ router.delete('/cliente/:id', async (req, res) => {
         }
     }
 });
+
 
 
 /**
