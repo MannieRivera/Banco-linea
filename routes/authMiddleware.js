@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const SECRET_KEY = 'UTH202403CC03';
 
-// Middleware to verify token
+
 function verifyToken(req, res, next) {
     console.log("Incoming headers:", req.headers); // Log incoming headers
     const token = req.headers['authorization'];

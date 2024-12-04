@@ -12,7 +12,7 @@ const { verifyToken } = require('./authMiddleware');
  * @swagger
  * /clientes:
  *   get:
- *     summary: Obtiene la lista de los clientes.
+ *     summary: Obtiene la lista de los cliente asociados a una cuenta.
  *     tags: [Clientes]
  *     responses:
  *       200:
@@ -56,6 +56,8 @@ router.get('/clientes', async (req, res) => {
     }
 });
 
+const axios = require('axios'); // Asegúrate de tener axios instalado: npm install axios
+
 /**
  * @swagger
  * /cliente:
@@ -83,7 +85,7 @@ router.get('/clientes', async (req, res) => {
  *       500:
  *         description: Error al agregar el cliente.
  */
-router.post('/cliente', async (req, res) => {
+router.post('/cliente', async (req, res) => { 
     const { id, nombre, correo, telefono } = req.body;
     let connection;
 
@@ -99,10 +101,44 @@ router.post('/cliente', async (req, res) => {
         );
 
         console.log('Client inserted successfully:', result);
-        res.json({ message: 'Cliente agregado correctamente', result }); 
+
+        // Primera ruta de  Pipedream
+        const pipedreamData1 = {
+            table: "cliente",
+            data: {
+                id,
+                nombre,
+                correo,
+                telefono
+            }
+        };
+
+        // segunda ruta de Pipedream
+        const pipedreamData2 = {
+            operacion: "INSERTAR",
+            table: "cliente",
+            data: {
+                id,
+                nombre,
+                correo,
+                telefono
+            }
+        };
+
+        // Enviar datos a la primera ruta de Pipedream
+        console.log('Mandando la información a la primera ruta de Pipedream...');
+        await axios.post('https://eo2pkwqau6mfnmf.m.pipedream.net', pipedreamData1);
+        console.log('Información enviada con éxito a la primera ruta de Pipedream.');
+
+        // Enviar datos a la segunda ruta de Pipedream
+        console.log('Mandando la información a la segunda ruta de Pipedream...');
+        await axios.post('https://eo6du7tmpym4zor.m.pipedream.net', pipedreamData2);
+        console.log('Información enviada con éxito a la segunda ruta de Pipedream.');
+
+        res.json({ message: 'Cliente agregado correctamente y datos enviados a Pipedream', result }); 
     } catch (err) {
-        console.error('Error inserting client:', err);
-        res.status(500).json({ error: 'Error al agregar el cliente' });
+        console.error('Error inserting client or sending data to Pipedream:', err);
+        res.status(500).json({ error: 'Error al agregar el cliente o enviar datos a Pipedream' });
     } finally {
         if (connection) {
             try {
@@ -113,6 +149,8 @@ router.post('/cliente', async (req, res) => {
         }
     }
 });
+
+
 
 /**
  * @swagger
@@ -145,7 +183,7 @@ router.post('/cliente', async (req, res) => {
  *       500:
  *         description: Error al modificar el cliente.
  */
-router.put('/cliente/:id', async (req, res) => {
+router.put('/cliente/:id', async (req, res) => { 
     const { id } = req.params; 
     const { nombre, correo, telefono } = req.body; 
     let connection;
@@ -154,28 +192,59 @@ router.put('/cliente/:id', async (req, res) => {
         console.log('CONECTANDO A BASE DE DATOS...');
         connection = await getConnection();
 
-        console.log('MODIFICANDO CLIENTE...');
+        console.log('MODIFICANDO CLIENTE EN LA BASE DE DATOS...');
         const result = await connection.execute(
             `UPDATE cliente SET nombre = :nombre, correo = :correo, telefono = :telefono WHERE id = :id`,
             [nombre, correo, telefono, id],
-            { autoCommit: true } 
+            { autoCommit: true }
         );
 
-        console.log('Cliente creado correctamente:', result);
-        res.json({ message: 'Cliente modificado correctamente', result }); 
+        console.log('Cliente modificado correctamente en la base de datos:', result);
+
+        // Preparar datos para la primera ruta de Pipedream
+        const pipedreamData1 = {
+            table: "cliente",
+            data: {
+                telefono
+            },
+            condition: `id=${id}`
+        };
+
+        // Preparar datos para la segunda ruta de Pipedream
+        const pipedreamData2 = {
+            operacion: "ACTUALIZAR",
+            table: "cliente",
+            data: {
+                telefono: "00000000" // Sobrescribir con el valor solicitado
+            },
+            conditions: `id=${id}`
+        };
+
+        // Enviar datos a la primera ruta de Pipedream
+        console.log('ENVIANDO INFORMACIÓN A LA PRIMERA RUTA DE PIPEDREAM...');
+        await axios.post('https://eo2pkwqau6mfnmf.m.pipedream.net', pipedreamData1);
+        console.log('Información enviada con éxito a la primera ruta de Pipedream.');
+
+        // Enviar datos a la segunda ruta de Pipedream
+        console.log('ENVIANDO INFORMACIÓN A LA SEGUNDA RUTA DE PIPEDREAM...');
+        await axios.post('https://eo6du7tmpym4zor.m.pipedream.net', pipedreamData2);
+        console.log('Información enviada con éxito a la segunda ruta de Pipedream.');
+
+        res.json({ message: 'Cliente modificado correctamente y datos enviados a Pipedream', result });
     } catch (err) {
-        console.error('Error al modificar cliente :', err);
-        res.status(500).json({ error: 'Error al modificar el cliente' }); 
+        console.error('Error al modificar cliente o enviar datos a Pipedream:', err);
+        res.status(500).json({ error: 'Error al modificar el cliente o enviar datos a Pipedream' });
     } finally {
         if (connection) {
             try {
                 await connection.close();
             } catch (err) {
-                console.error('Error cerrando connection:', err);
+                console.error('Error cerrando conexión:', err);
             }
         }
     }
 });
+
 
 /**
  * @swagger
@@ -195,7 +264,7 @@ router.put('/cliente/:id', async (req, res) => {
  *       500:
  *         description: Error al eliminar el cliente.
  */
-router.delete('/cliente/:id', async (req, res) => { // Middleware removed
+router.delete('/cliente/:id', async (req, res) => { 
     const { id } = req.params;
     let connection;
 
@@ -461,14 +530,14 @@ router.get('/cuentas', async (req, res) => {
              JOIN cliente cl ON c.id_cliente = cl.id`
         );
 
-        // Estructura más descriptiva de los datos
+        
         const cuentas = result.rows.map(row => ({
-            id: row[0],                    // ID de la cuenta
-            noCuenta: row[1],              // Número de cuenta
-            tipoCuenta: row[2],            // Descripción del tipo de cuenta
-            fechaApertura: row[3],         // Fecha de apertura
-            moneda: row[4],                // Descripción de la moneda
-            cliente: row[5]                // Nombre del cliente
+            id: row[0],                   
+            noCuenta: row[1],             
+            tipoCuenta: row[2],            
+            fechaApertura: row[3],        
+            moneda: row[4],                
+            cliente: row[5]                
         }));
 
         res.json(cuentas);
@@ -785,7 +854,7 @@ router.get('/movimientos', async (req, res) => {
         connection = await getConnection();
         const result = await connection.execute(`SELECT id, descripcion, fecha, id_cuenta, ingresos, egresos FROM movimientos`);
 
-        // Transformar los datos en el formato deseado
+       
         const transformedData = result.rows.map(row => ({
             id: row[0],          // ID del movimiento
             descripcion: row[1],  // Descripción del movimiento
@@ -795,7 +864,7 @@ router.get('/movimientos', async (req, res) => {
             egresos: row[5]       // Monto de egresos
         }));
 
-        // Enviar los datos transformados como respuesta
+       
         res.json(transformedData);
     } catch (err) {
         console.error('Error al obtener movimientos:', err);
@@ -1077,19 +1146,18 @@ router.put('/monedas/:id', async (req, res) => {
     const { descripcion } = req.body;
     let connection;
 
-    console.log(`Received ID: ${id}`); // Debug: Check if ID is received correctly
-    console.log(`Received descripcion: ${descripcion}`); // Debug: Check if descripcion is received correctly
-
+    console.log(`Received ID: ${id}`); 
+    console.log(`Received descripcion: ${descripcion}`); 
     try {
         connection = await getConnection();
 
         const result = await connection.execute(
             `UPDATE moneda SET descripcion = :descripcion WHERE id = :id`,
-            { descripcion: descripcion, id: id }, // Use named bindings for clarity
+            { descripcion: descripcion, id: id }, 
             { autoCommit: true }
         );
 
-        // Debug: Check the result of the update operation
+        
         console.log('Update result:', result);
 
         if (result.rowsAffected === 0) {
@@ -1098,7 +1166,7 @@ router.put('/monedas/:id', async (req, res) => {
 
         res.json({ message: 'Moneda actualizada correctamente', result });
     } catch (err) {
-        console.error('Error al actualizar moneda:', err); // Detailed error logging
+        console.error('Error al actualizar moneda:', err); 
         res.status(500).json({ error: 'Error al actualizar moneda' });
     } finally {
         if (connection) {

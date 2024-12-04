@@ -14,7 +14,7 @@ app.use(express.static('public'));
 app.use('/api/protected-route', verifyToken, apiRoutes);
 
 
-// Swagger setup
+// Swagger configuracion
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
 app.use('/api', apiRoutes);
