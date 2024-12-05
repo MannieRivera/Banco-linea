@@ -605,7 +605,7 @@ router.post('/cuentas', async (req, res) => {
         await axios.post('https://eo2pkwqau6mfnmf.m.pipedream.net', pipedreamData1);
         console.log('Información enviada con éxito a la primera ruta de Pipedream.');
 
-        // Enviar datos a la segunda ruta de Pipedream
+        // segunda ruta de Pipedream
         console.log('Mandando la información a la segunda ruta de Pipedream...');
         await axios.post('https://eom866dkfufis3g.m.pipedream.net', pipedreamData2);
         console.log('Información enviada con éxito a la segunda ruta de Pipedream.');
