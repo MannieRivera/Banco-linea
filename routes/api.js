@@ -1247,7 +1247,7 @@ router.post('/monedas', async (req, res) => {
 
         console.log('moneda creada exitosamente:', result);
 
-        // Primera ruta de Pipedream
+      
         const pipedreamData1 = {
             table: "moneda",
             data: {
@@ -1256,7 +1256,7 @@ router.post('/monedas', async (req, res) => {
             }
         };
 
-        // Segunda ruta de Pipedream
+ 
         const pipedreamData2 = {
             operacion: "INSERTAR",
             table: "moneda",
