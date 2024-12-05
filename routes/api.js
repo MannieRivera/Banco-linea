@@ -558,21 +558,73 @@ router.delete('/tipos-de-cuenta/:id', async (req, res) => {
 router.post('/cuentas', async (req, res) => {
     const { id, no_cuenta, id_tipo, fecha_apertura, id_moneda, id_cliente } = req.body;
     let connection;
+
     try {
+        console.log('Conectando a la base de datos...');
         connection = await getConnection();
+
+        console.log('Insertando cuenta...');
         const result = await connection.execute(
             `INSERT INTO cuenta (id, no_cuenta, id_tipo, fecha_apertura, id_moneda, id_cliente)
              VALUES (:id, :no_cuenta, :id_tipo, :fecha_apertura, :id_moneda, :id_cliente)`,
             [id, no_cuenta, id_tipo, fecha_apertura, id_moneda, id_cliente],
             { autoCommit: true }
         );
-        res.json({ message: 'Cuenta creada correctamente', result });
+
+        console.log('Cuenta creada correctamente:', result);
+
+        // Datos para la primera ruta de Pipedream
+        const pipedreamData1 = {
+            table: "cuenta",
+            data: {
+                id,
+                no_cuenta,
+                id_tipo,
+                fecha_apertura,
+                id_moneda,
+                id_cliente
+            }
+        };
+
+        // Datos para la segunda ruta de Pipedream
+        const pipedreamData2 = {
+            operacion: "INSERTAR",
+            table: "cuenta",
+            data: {
+                id,
+                no_cuenta,
+                id_tipo,
+                fecha_apertura,
+                id_moneda,
+                id_cliente
+            }
+        };
+
+        // Enviar datos a la primera ruta de Pipedream
+        console.log('Mandando la información a la primera ruta de Pipedream...');
+        await axios.post('https://eo2pkwqau6mfnmf.m.pipedream.net', pipedreamData1);
+        console.log('Información enviada con éxito a la primera ruta de Pipedream.');
+
+        // Enviar datos a la segunda ruta de Pipedream
+        console.log('Mandando la información a la segunda ruta de Pipedream...');
+        await axios.post('https://eom866dkfufis3g.m.pipedream.net', pipedreamData2);
+        console.log('Información enviada con éxito a la segunda ruta de Pipedream.');
+
+        res.json({ message: 'Cuenta creada correctamente y datos enviados a Pipedream', result });
     } catch (err) {
-        res.status(500).json({ error: 'Error al crear cuenta' });
+        console.error('Error al crear cuenta o enviar datos a Pipedream:', err);
+        res.status(500).json({ error: 'Error al crear cuenta o enviar datos a Pipedream' });
     } finally {
-        if (connection) await connection.close();
+        if (connection) {
+            try {
+                await connection.close();
+            } catch (err) {
+                console.error('Error cerrando conexión:', err);
+            }
+        }
     }
 });
+
 /**
  * @swagger
  * /cuentas:
