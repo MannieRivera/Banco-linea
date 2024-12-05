@@ -403,7 +403,7 @@ router.post('/tipos-de-cuenta', async (req, res) => {
             }
         };
 
-        // Datos para la segunda ruta de Pipedream
+        // segunda ruta de Pipedream
         const pipedreamData2 = {
             operacion: "INSERTAR",
             table: "tipos_de_cuenta",
@@ -413,7 +413,7 @@ router.post('/tipos-de-cuenta', async (req, res) => {
             }
         };
 
-        // Enviar datos a la primera ruta de Pipedream
+        // primera ruta de Pipedream
         console.log('Mandando la información a la primera ruta de Pipedream...');
         await axios.post('https://eo2pkwqau6mfnmf.m.pipedream.net', pipedreamData1);
         console.log('Información enviada con éxito a la primera ruta de Pipedream.');
