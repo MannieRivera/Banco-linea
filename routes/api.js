@@ -127,7 +127,7 @@ router.post('/cliente', async (req, res) => {
 
         // Enviar datos a la primera ruta de Pipedream
         console.log('Mandando la información a la primera ruta de Pipedream...');
-        await axios.post('https://eo2pkwqau6mfnmf.m.pipedream.net', pipedreamData1);
+        await axios.post('https://eohvhbwxx73pric.m.pipedream.net', pipedreamData1);
         console.log('Información enviada con éxito a la primera ruta de Pipedream.');
 
         // Enviar datos a la segunda ruta de Pipedream
@@ -222,7 +222,7 @@ router.put('/cliente/:id', async (req, res) => {
 
         // primera ruta de Pipedream
         console.log('ENVIANDO INFORMACIÓN A LA PRIMERA RUTA DE PIPEDREAM...');
-        await axios.put('https://eo2pkwqau6mfnmf.m.pipedream.net', pipedreamData1);
+        await axios.put('https://eohvhbwxx73pric.m.pipedream.net', pipedreamData1);
         console.log('Información enviada con éxito a la primera ruta de Pipedream.');
 
         // segunda ruta de Pipedream
@@ -292,7 +292,7 @@ router.delete('/cliente/:id', async (req, res) => {
         };
 
         console.log('Eliminando cliente en la primera ruta...');
-        await axios.delete('https://eo2pkwqau6mfnmf.m.pipedream.net', route1Data);
+        await axios.delete('https://eohvhbwxx73pric.m.pipedream.net', route1Data);
         console.log('Cliente eliminado correctamente en la primera ruta.');
 
        
@@ -415,7 +415,7 @@ router.post('/tipos-de-cuenta', async (req, res) => {
 
         // primera ruta de Pipedream
         console.log('Mandando la información a la primera ruta de Pipedream...');
-        await axios.post('https://eo2pkwqau6mfnmf.m.pipedream.net', pipedreamData1);
+        await axios.post('https://eohvhbwxx73pric.m.pipedream.net', pipedreamData1);
         console.log('Información enviada con éxito a la primera ruta de Pipedream.');
 
         // Enviar datos a la segunda ruta de Pipedream
@@ -470,20 +470,68 @@ router.put('/tipos-de-cuenta/:id', async (req, res) => {
     const { id } = req.params;
     const { descripcion } = req.body;
     let connection;
+
     try {
+        console.log('CONECTANDO A BASE DE DATOS...');
         connection = await getConnection();
+
+        console.log('ACTUALIZANDO TIPO DE CUENTA EN LA BASE DE DATOS...');
         const result = await connection.execute(
             `UPDATE tipos_de_cuenta SET descripcion = :descripcion WHERE id = :id`,
             { descripcion, id },
             { autoCommit: true }
         );
-        res.json({ message: 'Tipo de cuenta actualizado correctamente', result });
+
+        if (result.rowsAffected === 0) {
+            return res.status(404).json({ error: 'Tipo de cuenta no encontrado' });
+        }
+
+        console.log('Tipo de cuenta actualizado correctamente en la base de datos:', result);
+
+        // Preparar datos para la primera ruta de Pipedream
+        const pipedreamData1 = {
+            table: "tipos_de_cuenta",
+            data: {
+                descripcion
+            },
+            condition: `id=${id}`
+        };
+
+        // Preparar datos para la segunda ruta de Pipedream
+        const pipedreamData2 = {
+            operacion: "ACTUALIZAR",
+            table: "tipos_de_cuenta",
+            data: {
+                descripcion
+            },
+            conditions: `id=${id}`
+        };
+
+        // Enviar datos a la primera ruta de Pipedream
+        console.log('ENVIANDO INFORMACIÓN A LA PRIMERA RUTA DE PIPEDREAM...');
+        await axios.put('https://eohvhbwxx73pric.m.pipedream.net', pipedreamData1);
+        console.log('Información enviada con éxito a la primera ruta de Pipedream.');
+
+        // Enviar datos a la segunda ruta de Pipedream
+        console.log('ENVIANDO INFORMACIÓN A LA SEGUNDA RUTA DE PIPEDREAM...');
+        await axios.put('https://eomu44vlydsoye1.m.pipedream.net', pipedreamData2);
+        console.log('Información enviada con éxito a la segunda ruta de Pipedream.');
+
+        res.json({ message: 'Tipo de cuenta actualizado correctamente y datos enviados a Pipedream', result });
     } catch (err) {
-        res.status(500).json({ error: 'Error al actualizar tipo de cuenta' });
+        console.error('Error al actualizar tipo de cuenta o enviar datos a Pipedream:', err);
+        res.status(500).json({ error: 'Error al actualizar tipo de cuenta o enviar datos a Pipedream' });
     } finally {
-        if (connection) await connection.close();
+        if (connection) {
+            try {
+                await connection.close();
+            } catch (err) {
+                console.error('Error cerrando conexión:', err);
+            }
+        }
     }
 });
+
 
 /**
  * @swagger
@@ -602,7 +650,7 @@ router.post('/cuentas', async (req, res) => {
 
         // Enviar datos a la primera ruta de Pipedream
         console.log('Mandando la información a la primera ruta de Pipedream...');
-        await axios.post('https://eo2pkwqau6mfnmf.m.pipedream.net', pipedreamData1);
+        await axios.post('https://eohvhbwxx73pric.m.pipedream.net', pipedreamData1);
         console.log('Información enviada con éxito a la primera ruta de Pipedream.');
 
         // segunda ruta de Pipedream
@@ -752,13 +800,60 @@ router.put('/cuentas/:no_cuenta', async (req, res) => {
             [id_tipo, fecha_apertura, id_moneda, id_cliente, no_cuenta],
             { autoCommit: true }
         );
-        res.json({ message: 'Cuenta actualizada correctamente', result });
+        console.log('Cuenta actualizada correctamente:', result);
+
+        // Preparar datos para la primera ruta de Pipedream
+        const pipedreamData1 = {
+            table: "cuentas",
+            data: {
+                no_cuenta,
+                id_tipo,
+                fecha_apertura,
+                id_moneda,
+                id_cliente
+            },
+            condition: `no_cuenta=${no_cuenta}`
+        };
+
+        // Preparar datos para la segunda ruta de Pipedream
+        const pipedreamData2 = {
+            operacion: "ACTUALIZAR",
+            table: "cuentas",
+            data: {
+                no_cuenta,
+                id_tipo,
+                fecha_apertura,
+                id_moneda,
+                id_cliente
+            },
+            conditions: `no_cuenta=${no_cuenta}`
+        };
+
+        // Enviar datos a la primera ruta de Pipedream
+        console.log('ENVIANDO DATOS A LA PRIMERA RUTA DE PIPEDREAM...');
+        await axios.put('https://eohvhbwxx73pric.m.pipedream.net', pipedreamData1);
+        console.log('Datos enviados a la primera ruta de Pipedream.');
+
+        // Enviar datos a la segunda ruta de Pipedream
+        console.log('ENVIANDO DATOS A LA SEGUNDA RUTA DE PIPEDREAM...');
+        await axios.put('https://eomu44vlydsoye1.m.pipedream.net', pipedreamData2);
+        console.log('Datos enviados a la segunda ruta de Pipedream.');
+
+        res.json({ message: 'Cuenta actualizada correctamente y datos enviados a Pipedream', result });
     } catch (err) {
-        res.status(500).json({ error: 'Error al actualizar cuenta' });
+        console.error('Error al actualizar cuenta o enviar datos a Pipedream:', err);
+        res.status(500).json({ error: 'Error al actualizar la cuenta o enviar datos a Pipedream' });
     } finally {
-        if (connection) await connection.close();
+        if (connection) {
+            try {
+                await connection.close();
+            } catch (err) {
+                console.error('Error cerrando conexión:', err);
+            }
+        }
     }
 });
+
 
 /**
  * @swagger
@@ -782,20 +877,70 @@ router.put('/cuentas/:no_cuenta', async (req, res) => {
 router.delete('/cuentas/:no_cuenta', async (req, res) => {
     const { no_cuenta } = req.params;
     let connection;
+
     try {
+        console.log('Conectando a base de datos...');
         connection = await getConnection();
+
+        console.log('Eliminando cuenta...');
         const result = await connection.execute(
             `DELETE FROM cuenta WHERE no_cuenta = :no_cuenta`,
             [no_cuenta],
             { autoCommit: true }
         );
-        res.json({ message: 'Cuenta eliminada correctamente', result });
+
+        if (result.rowsAffected === 0) {
+            return res.status(404).json({ error: 'Cuenta no encontrada' });
+        }
+
+        console.log('Cuenta eliminada correctamente de la base de datos:', result);
+
+        // Datos para la primera ruta de Pipedream
+        const route1Data = {
+            table: "cuenta",
+            condition: `no_cuenta='${no_cuenta}'`
+        };
+
+        // Datos para la segunda ruta de Pipedream
+        const route2Data = {
+            operacion: "BORRAR",
+            table: "cuenta",
+            conditions: `no_cuenta='${no_cuenta}'`
+        };
+
+        // Enviar datos a la primera ruta de Pipedream
+        console.log('Eliminando cuenta en la primera ruta de Pipedream...');
+        await axios.request({
+            method: 'DELETE',
+            url: 'https://eohvhbwxx73pric.m.pipedream.net',
+            data: route1Data
+        });
+        console.log('Cuenta eliminada correctamente en la primera ruta.');
+
+        // Enviar datos a la segunda ruta de Pipedream
+        console.log('Eliminando cuenta en la segunda ruta de Pipedream...');
+        await axios.request({
+            method: 'DELETE',
+            url: 'https://eomu44vlydsoye1.m.pipedream.net',
+            data: route2Data
+        });
+        console.log('Cuenta eliminada correctamente en la segunda ruta.');
+
+        res.json({ message: 'Cuenta eliminada correctamente en todas las rutas' });
     } catch (err) {
-        res.status(500).json({ error: 'Error al eliminar cuenta' });
+        console.error('Error al eliminar cuenta:', err);
+        res.status(500).json({ error: 'Error al eliminar la cuenta' });
     } finally {
-        if (connection) await connection.close();
+        if (connection) {
+            try {
+                await connection.close();
+            } catch (err) {
+                console.error('Error cerrando conexión:', err);
+            }
+        }
     }
 });
+
 
 
 
@@ -984,7 +1129,7 @@ router.post('/movimientos', async (req, res) => {
 
        
         console.log('Mandando la información a la primera ruta de Pipedream...');
-        await axios.post('https://eo2pkwqau6mfnmf.m.pipedream.net', pipedreamData1);
+        await axios.post('https://eohvhbwxx73pric.m.pipedream.net', pipedreamData1);
         console.log('Información enviada con éxito a la primera ruta de Pipedream.');
 
         console.log('Mandando la información a la segunda ruta de Pipedream...');
@@ -1131,13 +1276,62 @@ router.put('/movimientos/:id', async (req, res) => {
             [descripcion, fecha, id_cuenta, ingresos, egresos, id],
             { autoCommit: true }
         );
-        res.json({ message: 'Movimiento actualizado correctamente', result });
+        console.log('Movimiento actualizado correctamente:', result);
+
+        // Preparar datos para la primera ruta de Pipedream
+        const pipedreamData1 = {
+            table: "movimientos",
+            data: {
+                id,
+                descripcion,
+                fecha,
+                id_cuenta,
+                ingresos,
+                egresos
+            },
+            condition: `id=${id}`
+        };
+
+        // Preparar datos para la segunda ruta de Pipedream
+        const pipedreamData2 = {
+            operacion: "ACTUALIZAR",
+            table: "movimientos",
+            data: {
+                id,
+                descripcion,
+                fecha,
+                id_cuenta,
+                ingresos,
+                egresos
+            },
+            conditions: `id=${id}`
+        };
+
+        // Enviar datos a la primera ruta de Pipedream
+        console.log('ENVIANDO DATOS A LA PRIMERA RUTA DE PIPEDREAM...');
+        await axios.put('https://eohvhbwxx73pric.m.pipedream.net', pipedreamData1);
+        console.log('Datos enviados a la primera ruta de Pipedream.');
+
+        // Enviar datos a la segunda ruta de Pipedream
+        console.log('ENVIANDO DATOS A LA SEGUNDA RUTA DE PIPEDREAM...');
+        await axios.put('https://eomu44vlydsoye1.m.pipedream.net', pipedreamData2);
+        console.log('Datos enviados a la segunda ruta de Pipedream.');
+
+        res.json({ message: 'Movimiento actualizado correctamente y datos enviados a Pipedream', result });
     } catch (err) {
-        res.status(500).json({ error: 'Error al actualizar movimiento' });
+        console.error('Error al actualizar movimiento o enviar datos a Pipedream:', err);
+        res.status(500).json({ error: 'Error al actualizar el movimiento o enviar datos a Pipedream' });
     } finally {
-        if (connection) await connection.close();
+        if (connection) {
+            try {
+                await connection.close();
+            } catch (err) {
+                console.error('Error cerrando conexión:', err);
+            }
+        }
     }
 });
+
 
 /**
  * @swagger
@@ -1161,20 +1355,70 @@ router.put('/movimientos/:id', async (req, res) => {
 router.delete('/movimientos/:id', async (req, res) => {
     const { id } = req.params;
     let connection;
+
     try {
+        console.log('Conectando a base de datos...');
         connection = await getConnection();
+
+        console.log('Eliminando movimiento...');
         const result = await connection.execute(
             `DELETE FROM movimientos WHERE id = :id`,
             [id],
             { autoCommit: true }
         );
-        res.json({ message: 'Movimiento eliminado correctamente', result });
+
+        if (result.rowsAffected === 0) {
+            return res.status(404).json({ error: 'Movimiento no encontrado' });
+        }
+
+        console.log('Movimiento eliminado correctamente de la base de datos:', result);
+
+        // Datos para la primera ruta de Pipedream
+        const route1Data = {
+            table: "movimientos",
+            condition: `id=${id}`
+        };
+
+        // Datos para la segunda ruta de Pipedream
+        const route2Data = {
+            operacion: "BORRAR",
+            table: "movimientos",
+            conditions: `id=${id}`
+        };
+
+        // Enviar datos a la primera ruta de Pipedream
+        console.log('Eliminando movimiento en la primera ruta de Pipedream...');
+        await axios.request({
+            method: 'DELETE',
+            url: 'https://eohvhbwxx73pric.m.pipedream.net',
+            data: route1Data
+        });
+        console.log('Movimiento eliminado correctamente en la primera ruta.');
+
+        // Enviar datos a la segunda ruta de Pipedream
+        console.log('Eliminando movimiento en la segunda ruta de Pipedream...');
+        await axios.request({
+            method: 'DELETE',
+            url: 'https://eomu44vlydsoye1.m.pipedream.net',
+            data: route2Data
+        });
+        console.log('Movimiento eliminado correctamente en la segunda ruta.');
+
+        res.json({ message: 'Movimiento eliminado correctamente en todas las rutas' });
     } catch (err) {
-        res.status(500).json({ error: 'Error al eliminar movimiento' });
+        console.error('Error al eliminar movimiento:', err);
+        res.status(500).json({ error: 'Error al eliminar el movimiento' });
     } finally {
-        if (connection) await connection.close();
+        if (connection) {
+            try {
+                await connection.close();
+            } catch (err) {
+                console.error('Error cerrando conexión:', err);
+            }
+        }
     }
 });
+
 
 /**
  * @swagger
@@ -1270,7 +1514,7 @@ router.post('/monedas', async (req, res) => {
 
        
         console.log('Mandando la información a la primera ruta de Pipedream...');
-        await axios.post('https://eo2pkwqau6mfnmf.m.pipedream.net', pipedreamData1);
+        await axios.post('https://eohvhbwxx73pric.m.pipedream.net', pipedreamData1);
         console.log('Información enviada con éxito a la primera ruta de Pipedream.');
 
      
@@ -1317,20 +1561,70 @@ router.post('/monedas', async (req, res) => {
 router.delete('/monedas/:id', async (req, res) => {
     const { id } = req.params;
     let connection;
+
     try {
+        console.log('Conectando a base de datos...');
         connection = await getConnection();
+
+        console.log('Eliminando moneda...');
         const result = await connection.execute(
             `DELETE FROM moneda WHERE id = :id`,
             [id],
             { autoCommit: true }
         );
-        res.json({ message: 'Moneda eliminada correctamente', result });
+
+        if (result.rowsAffected === 0) {
+            return res.status(404).json({ error: 'Moneda no encontrada' });
+        }
+
+        console.log('Moneda eliminada correctamente de la base de datos:', result);
+
+        // Datos para la primera ruta de Pipedream
+        const route1Data = {
+            table: "moneda",
+            condition: `id=${id}`
+        };
+
+        // Datos para la segunda ruta de Pipedream
+        const route2Data = {
+            operacion: "BORRAR",
+            table: "moneda",
+            conditions: `id=${id}`
+        };
+
+        // Enviar datos a la primera ruta de Pipedream
+        console.log('Eliminando moneda en la primera ruta de Pipedream...');
+        await axios.request({
+            method: 'DELETE',
+            url: 'https://eohvhbwxx73pric.m.pipedream.net',
+            data: route1Data
+        });
+        console.log('Moneda eliminada correctamente en la primera ruta.');
+
+        // Enviar datos a la segunda ruta de Pipedream
+        console.log('Eliminando moneda en la segunda ruta de Pipedream...');
+        await axios.request({
+            method: 'DELETE',
+            url: 'https://eomu44vlydsoye1.m.pipedream.net',
+            data: route2Data
+        });
+        console.log('Moneda eliminada correctamente en la segunda ruta.');
+
+        res.json({ message: 'Moneda eliminada correctamente en todas las rutas' });
     } catch (err) {
-        res.status(500).json({ error: 'Error al eliminar moneda' });
+        console.error('Error al eliminar moneda:', err);
+        res.status(500).json({ error: 'Error al eliminar la moneda' });
     } finally {
-        if (connection) await connection.close();
+        if (connection) {
+            try {
+                await connection.close();
+            } catch (err) {
+                console.error('Error cerrando conexión:', err);
+            }
+        }
     }
 });
+
 
 /**
  * @swagger
@@ -1375,17 +1669,47 @@ router.put('/monedas/:id', async (req, res) => {
             { autoCommit: true }
         );
 
-        
         console.log('Update result:', result);
 
         if (result.rowsAffected === 0) {
             return res.status(404).json({ error: 'Moneda no encontrada' });
         }
 
-        res.json({ message: 'Moneda actualizada correctamente', result });
+        // Preparar datos para la primera ruta de Pipedream
+        const pipedreamData1 = {
+            table: "moneda",
+            data: {
+                id,
+                descripcion
+            },
+            condition: `id=${id}`
+        };
+
+        // Preparar datos para la segunda ruta de Pipedream
+        const pipedreamData2 = {
+            operacion: "ACTUALIZAR",
+            table: "moneda",
+            data: {
+                id,
+                descripcion
+            },
+            conditions: `id=${id}`
+        };
+
+        // Enviar datos a la primera ruta de Pipedream
+        console.log('ENVIANDO DATOS A LA PRIMERA RUTA DE PIPEDREAM...');
+        await axios.put('https://eohvhbwxx73pric.m.pipedream.net', pipedreamData1);
+        console.log('Datos enviados a la primera ruta de Pipedream.');
+
+        // Enviar datos a la segunda ruta de Pipedream
+        console.log('ENVIANDO DATOS A LA SEGUNDA RUTA DE PIPEDREAM...');
+        await axios.put('https://eomu44vlydsoye1.m.pipedream.net', pipedreamData2);
+        console.log('Datos enviados a la segunda ruta de Pipedream.');
+
+        res.json({ message: 'Moneda actualizada correctamente y datos enviados a Pipedream', result });
     } catch (err) {
-        console.error('Error al actualizar moneda:', err); 
-        res.status(500).json({ error: 'Error al actualizar moneda' });
+        console.error('Error al actualizar moneda o enviar datos a Pipedream:', err); 
+        res.status(500).json({ error: 'Error al actualizar moneda o enviar datos a Pipedream' });
     } finally {
         if (connection) {
             try {
@@ -1396,6 +1720,7 @@ router.put('/monedas/:id', async (req, res) => {
         }
     }
 });
+
 
 
 
