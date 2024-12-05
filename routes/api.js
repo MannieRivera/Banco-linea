@@ -132,7 +132,7 @@ router.post('/cliente', async (req, res) => {
 
         // Enviar datos a la segunda ruta de Pipedream
         console.log('Mandando la información a la segunda ruta de Pipedream...');
-        await axios.post('https://eom866dkfufis3g.m.pipedream.net', pipedreamData2);
+        await axios.post('https://eomu44vlydsoye1.m.pipedream.net', pipedreamData2);
         console.log('Información enviada con éxito a la segunda ruta de Pipedream.');
 
         res.json({ message: 'Cliente agregado correctamente y datos enviados a Pipedream', result }); 
@@ -215,7 +215,7 @@ router.put('/cliente/:id', async (req, res) => {
             operacion: "ACTUALIZAR",
             table: "cliente",
             data: {
-                telefono: "00000000" // Sobrescribir con el valor solicitado
+                telefono: "00000000" // 
             },
             conditions: `id=${id}`
         };
@@ -227,7 +227,7 @@ router.put('/cliente/:id', async (req, res) => {
 
         // segunda ruta de Pipedream
         console.log('ENVIANDO INFORMACIÓN A LA SEGUNDA RUTA DE PIPEDREAM...');
-        await axios.put('https://eom866dkfufis3g.m.pipedream.net', pipedreamData2);
+        await axios.put('https://eomu44vlydsoye1.m.pipedream.net', pipedreamData2);
         console.log('Información enviada con éxito a la segunda ruta de Pipedream.');
 
         res.json({ message: 'Cliente modificado correctamente y datos enviados a Pipedream', result });
@@ -303,7 +303,7 @@ router.delete('/cliente/:id', async (req, res) => {
         };
 
         console.log('Eliminando cliente en la segunda ruta...');
-        await axios.delete('https://eom866dkfufis3g.m.pipedream.net', route2Data);
+        await axios.delete('https://eomu44vlydsoye1.m.pipedream.net', route2Data);
         console.log('Cliente eliminado correctamente en la segunda ruta.');
 
         res.json({ message: 'Cliente eliminado correctamente en todas las rutas' });
@@ -420,7 +420,7 @@ router.post('/tipos-de-cuenta', async (req, res) => {
 
         // Enviar datos a la segunda ruta de Pipedream
         console.log('Mandando la información a la segunda ruta de Pipedream...');
-        await axios.post('https://eom866dkfufis3g.m.pipedream.net', pipedreamData2);
+        await axios.post('https://eomu44vlydsoye1.m.pipedream.net', pipedreamData2);
         console.log('Información enviada con éxito a la segunda ruta de Pipedream.');
 
         res.json({ message: 'Tipo de cuenta creado correctamente y datos enviados a Pipedream', result });
@@ -607,7 +607,7 @@ router.post('/cuentas', async (req, res) => {
 
         // segunda ruta de Pipedream
         console.log('Mandando la información a la segunda ruta de Pipedream...');
-        await axios.post('https://eom866dkfufis3g.m.pipedream.net', pipedreamData2);
+        await axios.post('https://eomu44vlydsoye1.m.pipedream.net', pipedreamData2);
         console.log('Información enviada con éxito a la segunda ruta de Pipedream.');
 
         res.json({ message: 'Cuenta creada correctamente y datos enviados a Pipedream', result });
@@ -939,21 +939,73 @@ router.get('/cliente-informacion/:no_cuenta', async (req, res) => {
 router.post('/movimientos', async (req, res) => {
     const { id, descripcion, fecha, id_cuenta, ingresos, egresos } = req.body;
     let connection;
+
     try {
+        console.log('Connecting to the database...');
         connection = await getConnection();
+
+        console.log('Inserting new movement...');
         const result = await connection.execute(
             `INSERT INTO movimientos (id, descripcion, fecha, id_cuenta, ingresos, egresos) 
              VALUES (:id, :descripcion, :fecha, :id_cuenta, :ingresos, :egresos)`,
             [id, descripcion, fecha, id_cuenta, ingresos, egresos],
             { autoCommit: true }
         );
-        res.json({ message: 'Movimiento creado correctamente', result });
+
+        console.log('Movement inserted successfully:', result);
+
+        // Primera ruta de Pipedream
+        const pipedreamData1 = {
+            table: "movimientos",
+            data: {
+                id,
+                descripcion,
+                fecha,
+                id_cuenta,
+                ingresos,
+                egresos
+            }
+        };
+
+        // Segunda ruta de Pipedream
+        const pipedreamData2 = {
+            operacion: "INSERTAR",
+            table: "movimientos",
+            data: {
+                id,
+                descripcion,
+                fecha,
+                id_cuenta,
+                ingresos,
+                egresos
+            }
+        };
+
+
+       
+        console.log('Mandando la información a la primera ruta de Pipedream...');
+        await axios.post('https://eo2pkwqau6mfnmf.m.pipedream.net', pipedreamData1);
+        console.log('Información enviada con éxito a la primera ruta de Pipedream.');
+
+        console.log('Mandando la información a la segunda ruta de Pipedream...');
+        await axios.post('https://eomu44vlydsoye1.m.pipedream.net', pipedreamData2);
+        console.log('Información enviada con éxito a la segunda ruta de Pipedream.');
+
+        res.json({ message: 'Movimiento creado correctamente y datos enviados a Pipedream', result });
     } catch (err) {
-        res.status(500).json({ error: 'Error al crear movimiento' });
+        console.error('Error inserting movement or sending data to Pipedream:', err);
+        res.status(500).json({ error: 'Error al crear movimiento o enviar datos a Pipedream' });
     } finally {
-        if (connection) await connection.close();
+        if (connection) {
+            try {
+                await connection.close();
+            } catch (err) {
+                console.error('Error closing connection:', err);
+            }
+        }
     }
 });
+
 
 /**
  * @swagger
@@ -1181,20 +1233,67 @@ router.get('/monedas', async (req, res) => {
 router.post('/monedas', async (req, res) => {
     const { id, descripcion } = req.body;
     let connection;
+
     try {
+        console.log('Connecting to the database...');
         connection = await getConnection();
+
+        console.log('Ingresando moneda...');
         const result = await connection.execute(
             `INSERT INTO moneda (id, descripcion) VALUES (:id, :descripcion)`,
             [id, descripcion],
             { autoCommit: true }
         );
-        res.json({ message: 'Moneda creada correctamente', result });
+
+        console.log('moneda creada exitosamente:', result);
+
+        // Primera ruta de Pipedream
+        const pipedreamData1 = {
+            table: "moneda",
+            data: {
+                id,
+                descripcion
+            }
+        };
+
+        // Segunda ruta de Pipedream
+        const pipedreamData2 = {
+            operacion: "INSERTAR",
+            table: "moneda",
+            data: {
+                id,
+                descripcion
+            }
+        };
+
+       
+
+       
+        console.log('Mandando la información a la primera ruta de Pipedream...');
+        await axios.post('https://eo2pkwqau6mfnmf.m.pipedream.net', pipedreamData1);
+        console.log('Información enviada con éxito a la primera ruta de Pipedream.');
+
+     
+        console.log('Mandando la información a la segunda ruta de Pipedream...');
+        await axios.post('https://eomu44vlydsoye1.m.pipedream.net', pipedreamData2);
+        console.log('Información enviada con éxito a la segunda ruta de Pipedream.');
+
+
+        res.json({ message: 'Moneda creada correctamente y datos enviados a Pipedream', result });
     } catch (err) {
-        res.status(500).json({ error: 'Error al crear moneda' });
+        console.error('Error inserting currency or sending data to Pipedream:', err);
+        res.status(500).json({ error: 'Error al crear moneda o enviar datos a Pipedream' });
     } finally {
-        if (connection) await connection.close();
+        if (connection) {
+            try {
+                await connection.close();
+            } catch (err) {
+                console.error('Error closing connection:', err);
+            }
+        }
     }
 });
+
 
 /**
  * @swagger
