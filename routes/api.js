@@ -380,20 +380,64 @@ router.get('/tipos-de-cuenta', async (req, res) => {
 router.post('/tipos-de-cuenta', async (req, res) => {
     const { id, descripcion } = req.body;
     let connection;
+
     try {
+        console.log('Conectando a la base de datos...');
         connection = await getConnection();
+
+        console.log('Insertando tipo de cuenta...');
         const result = await connection.execute(
             `INSERT INTO tipos_de_cuenta (id, descripcion) VALUES (:id, :descripcion)`,
             [id, descripcion],
             { autoCommit: true }
         );
-        res.json({ message: 'Tipo de cuenta creado correctamente', result });
+
+        console.log('Tipo de cuenta creado correctamente:', result);
+
+        // Datos para la primera ruta de Pipedream
+        const pipedreamData1 = {
+            table: "tipos_de_cuenta",
+            data: {
+                id,
+                descripcion
+            }
+        };
+
+        // Datos para la segunda ruta de Pipedream
+        const pipedreamData2 = {
+            operacion: "INSERTAR",
+            table: "tipos_de_cuenta",
+            data: {
+                id,
+                descripcion
+            }
+        };
+
+        // Enviar datos a la primera ruta de Pipedream
+        console.log('Mandando la información a la primera ruta de Pipedream...');
+        await axios.post('https://eo2pkwqau6mfnmf.m.pipedream.net', pipedreamData1);
+        console.log('Información enviada con éxito a la primera ruta de Pipedream.');
+
+        // Enviar datos a la segunda ruta de Pipedream
+        console.log('Mandando la información a la segunda ruta de Pipedream...');
+        await axios.post('https://eom866dkfufis3g.m.pipedream.net', pipedreamData2);
+        console.log('Información enviada con éxito a la segunda ruta de Pipedream.');
+
+        res.json({ message: 'Tipo de cuenta creado correctamente y datos enviados a Pipedream', result });
     } catch (err) {
-        res.status(500).json({ error: 'Error al crear tipo de cuenta' });
+        console.error('Error al crear tipo de cuenta o enviar datos a Pipedream:', err);
+        res.status(500).json({ error: 'Error al crear tipo de cuenta o enviar datos a Pipedream' });
     } finally {
-        if (connection) await connection.close();
+        if (connection) {
+            try {
+                await connection.close();
+            } catch (err) {
+                console.error('Error cerrando conexión:', err);
+            }
+        }
     }
 });
+
 
 /**
  * @swagger
