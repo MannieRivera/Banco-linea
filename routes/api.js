@@ -297,7 +297,6 @@ router.delete('/cliente/:id', async (req, res) => {
 
        
         const route2Data = {
-            operacion: "BORRAR",
             table: "cliente",
             conditions: `id=${id}`
         };
