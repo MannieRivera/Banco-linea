@@ -291,7 +291,7 @@ router.delete('/cliente/:id', async (req, res) => {
         };
 
         console.log('Eliminando cliente en la primera ruta...');
-        await axios.post('https://eohvhbwxx73pric.m.pipedream.net', route1Data);
+        await axios.delete('https://eohvhbwxx73pric.m.pipedream.net', route1Data);
         console.log('Cliente eliminado correctamente en la primera ruta.');
 
        
@@ -301,7 +301,7 @@ router.delete('/cliente/:id', async (req, res) => {
         };
 
         console.log('Eliminando cliente en la segunda ruta...');
-        await axios.post('https://eomu44vlydsoye1.m.pipedream.net', route2Data);
+        await axios.delete('https://eomu44vlydsoye1.m.pipedream.net', route2Data);
         console.log('Cliente eliminado correctamente en la segunda ruta.');
 
         res.json({ message: 'Cliente eliminado correctamente en todas las rutas' });
