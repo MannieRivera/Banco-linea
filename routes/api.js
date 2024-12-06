@@ -212,7 +212,6 @@ router.put('/cliente/:id', async (req, res) => {
 
         // Preparar datos para la segunda ruta de Pipedream
         const pipedreamData2 = {
-            operacion: "ACTUALIZAR",
             table: "cliente",
             data: {
                 telefono: "00000000" // 
